@@ -21,8 +21,7 @@ It includes the followings dependencies:
  * mlst (2.19.6)
  * abricate (1.0.1 | Database: vfdb ecoli_vf ecoh card megares resfinder argannot ncbi plasmidfinder)
  * roary (3.13.0)
- * parsnp (1.5.3)
- * iqtree (2.0.3)
+ * iqtree (2.1.2)
 
 ## Installation
 
@@ -33,58 +32,34 @@ The simplest method is installed via conda:
    
 1. Create a conda environment with all the necessary dependencies: 
 ```bash
-conda create -c bioconda -c conda-forge -c anaconda --name amromics-viz \
-      python=3.7 \
-      ipykernel \
-      numpy \
-      pandas \
-      tqdm \
-      biopython \
-      pysam \
-      prokka \
-      samtools \
-      mlst \
-      abricate \
-      shovill \
-      roary \
-      iqtree \
-      parsnp \
-      sra-tools \
-      nodejs
+conda create -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults --name amromics --file submodules/amromics/requirements.txt
 ```
-2. Setup nodejs
+2. Activate amromics environment and install amromics library and script
 ```bash
-source activate amromics-viz
+source activate amromics
+(cd submodules/amromics && pip install . --use-feature=in-tree-build) 
+
+```
+
+3. Install nodejs
+```bash
+conda install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
-3. Clone **amromics-vis** GitHub repository to your local computer:
-Change the current working directory to the location where you want the 
-cloned directory.
-```bash
-git clone https://github.com/amromics-org/amromics-vis.git
-```
+
 4. (Optional) Setup and build web application using npm 
 
 ```bash
-cd amromics-vis
 npm install
 npm run build --modern
 ```
 
 ## Usage
 
-Everytime you start using Amromics-viz, make sure you have activated
-the *amromics-viz* conda environment. This can beIf not yet, activate the environment
-with the following command:
-```bash
-source activate amromics-viz
-```
-
-Amromics-viz comprises two components: a web application and an analysis 
-pipeline. 
+AMR-viz comprises two components: a web application and an analysis pipeline. 
 
 ### To run the web application
-Change the current working directory to the **amromics-vis** cloned directory 
+Change the current working directory to the **amrvis** cloned directory 
 in the step 4 of Intallation above.
 ```bash
 ./amrviz.py start [-p 3000] [--webapp-dir web-app]
@@ -94,7 +69,6 @@ The web application is auto opened on the URL **localhost:3000** (or another
 port if this port is occupied). 
 
 ### To run the pipeline
-
 
 ### Examples
 
@@ -110,7 +84,6 @@ to the web-app for visualization:
 ```bash
 ./amrviz.py pa --time-log k24_time.log  -t 7 -m 25 -c KpClinicalGRBZ -i examples/Kp24/Kp24.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 24 clinical isolates from Greek and Brazil"
 ```
-
 
 
 <!--

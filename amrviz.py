@@ -6,7 +6,6 @@
 from __future__ import division, print_function, absolute_import
 
 import argparse
-import json
 import logging
 import extract_json
 import os
@@ -67,8 +66,17 @@ def collection_extract_func(args):
         os.makedirs(webapp_data_dir)
 
     # Making sure the analysis for the
-    extract_json.export_json(work_dir, webapp_data_dir,
-                             collection_id, collection_name)
+    cmd = f'amr-analysis.py pg -t {args.threads} -m {args.memory} -i {args.input} -c {collection_id}'
+    cmd += f' --work-dir {work_dir} -n "{collection_name}"'
+    if args.time_log is not None:
+        cmd += f' --time-log {args.time_log}'
+
+    ret = os.system(cmd)
+    if ret != 0:
+        logger.error('Error running the pipeline')
+        exit(1)
+
+    extract_json.export_json(work_dir, webapp_data_dir, collection_id, collection_name)
     logger.info('Congratulations, collection {} is imported to web-app!'.format(collection_id))
 
 
