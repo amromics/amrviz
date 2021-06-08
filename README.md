@@ -72,7 +72,7 @@ port if this port is occupied).
 
 ### Examples
 
-We prepare a dataset for amrviz which from public data base. To download the raw data,
+We prepare a dataset for amrviz which from public database. To download the raw data,
 ```bash
 cd examples/Kp24/raw
 ./download.sh
@@ -84,6 +84,21 @@ to the web-app for visualization:
 ```bash
 ./amrviz.py pa --time-log k24_time.log  -t 7 -m 25 -c KpClinicalGRBZ -i examples/Kp24/Kp24.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 24 clinical isolates from Greek and Brazil"
 ```
+
+
+A smaller dataset is prepared for illustration. For download data
+
+```bash
+cd examples/Kp24/raw
+./download_Kp4.sh
+cd ../../
+```
+
+And to run the pipeline
+```bash
+./amrviz.py pa --time-log Kp4_time.log  -t 8 -m 14 -c Kp4 -i examples/Kp24/config_Kp4.tsv --work-dir data/work --webapp-dir web-app -n "Sample dataset "
+```
+
 
 
 <!--
