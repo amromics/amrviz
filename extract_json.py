@@ -47,10 +47,8 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
     for sample in report['samples']:
         sample_files = []
         sample_files.append({'name': 'FASTA', 'file': copy_file_to_web(sample['assembly'], exp_dir_downloadfile)})
-        sample_files.append({'name': 'GFF', 'file': copy_file_to_web(
-            os.path.join(sample['annotation'], sample['id']+'.gff.gz'), exp_dir_downloadfile)})
-        sample_files.append({'name': 'GBK', 'file': copy_file_to_web(
-            os.path.join(sample['annotation'], sample['id']+'.gbk.gz'), exp_dir_downloadfile)})
+        sample_files.append({'name': 'GFF', 'file': copy_file_to_web(sample['annotation_gff'], exp_dir_downloadfile)})
+        sample_files.append({'name': 'GBK', 'file': copy_file_to_web(sample['annotation_gbk'], exp_dir_downloadfile)})
 
         sample_results = []
         sample_results.append({'group': 'CONTIG', 'data': export_assembly(sample['assembly'])})
@@ -58,7 +56,7 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
         sample_results.append({'group': 'VIR', 'data': find_virulome(sample['virulome'])})
         sample_results.append({'group': 'AMR', 'data': find_amr(sample['resistome'])})
         sample_results.append({'group': 'PLASMID', 'data': find_plasmid(sample['plasmid'])})
-        sample_results.append({'group': 'ANNOTATION', 'data': export_known_genes(sample['annotation'])})
+        sample_results.append({'group': 'ANNOTATION', 'data': export_known_genes(sample['annotation_gff'])})
 
         sample['result'] = sample_results
 
@@ -253,18 +251,13 @@ def find_plasmid(plasmid_file):
     return ret
 
 
-def export_known_genes(annotation_folder):
+def export_known_genes(annotation_gff):
     # look for gff file
-    gff_file = None
-    for root, dirs, files in os.walk(annotation_folder):
-        for _file in files:
-            if _file.endswith('.gff.gz'):
-                gff_file = os.path.abspath(str(root) + '/' + _file)
-    if gff_file is None:
+    if annotation_gff is None:
         return ''
     knowgene = {'genes': []}
     #f = open(gff_file)
-    with gzip.open(gff_file, 'rt') as f:
+    with gzip.open(annotation_gff, 'rt') as f:
         line = f.readline()
         while line:
             if not line.startswith('##'):
