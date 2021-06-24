@@ -14,11 +14,11 @@
     margin-right: 5px;
   }
   .loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border: 7px solid #f3f3f3; /* Light grey */
+  border-top: 7px solid #3498db; /* Blue */
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
+  width: 30px;
+  height: 30px;
   animation: spin 2s linear infinite;
   display: inline-block;
 }
@@ -39,12 +39,13 @@ select{
 .center {
   text-align: center;
 }
+
 </style>
 <template>
 <div class="row">
   <div class="col-12" v-if="!loaded">
-      <div class="loader"></div>
-      <div>Data loading...</div>
+      <div class="loader" style="float:left"></div>
+      <div style="float :left;font-size:20px">Data loading...</div>
     </div>
    <div class="col-12" v-if="loaded">
       <card :title="sampleId">
@@ -97,19 +98,7 @@ select{
   </div>
    </card>
 </div>
-<div v-if="loaded" style="height: 650px;"  class="col-12">
-   <card :title="statsCards.browser">
 
-<div>
-  <div style="width:500px;height: 300px;float:left">
-    <GenomeCircosBrowser :contigs="assemblyData.contigs" :amr_genes= "resistomeData.hits" :virulome_genes= "virulomeData.hits" :skew="assemblyData.skew"/>
-  </div>
-  <div style="margin-left: 500px;height:300px;">
-    <GenomeBrowser :list_contig="assemblyData.contigs" :knowngene= "annotationData.genes" :GC_skew= "assemblyData.skew" :GC_content="assemblyData.content.array"/>
-  </div>
-  </div>
-   </card>
-</div>
 
 <div  class="col-12" v-if="loaded">
  <card :title="statsCards.amr">
@@ -130,8 +119,8 @@ select{
   <tbody>
     <tr v-for="item in resistomeData.hits" :key="item.name">
       <td>{{item.sequence}}</td>
-      <td>{{item.start}}</td>
-      <td>{{item.end}}</td>
+      <td class="start"><button type="button" class="btn btn-info btn-sm minibutton">{{item.start}}</button></td>
+      <td class="end"><button type="button" class="btn btn-info btn-sm minibutton">{{item.end}}</button></td>
       <td>{{item.gene}}</td>
       <td>{{item.identity}}</td>
       <td>{{item.db}}</td>
@@ -176,8 +165,9 @@ select{
   <tbody>
     <tr v-for="item in virulomeData.hits" :key="item.name">
       <td>{{item.sequence}}</td>
-      <td>{{item.start}}</td>
-      <td>{{item.end}}</td>
+      <td class="start"><button type="button" class="btn btn-info btn-sm minibutton">{{item.start}}</button></td>
+      <td class="end"><button type="button" class="btn btn-info btn-sm minibutton">{{item.end}}</button></td>
+      
       <td>{{item.gene}}</td>
       <td>{{item.coverage}}</td>
       <td>{{item.identity}}</td>
@@ -189,6 +179,19 @@ select{
   </tbody>
 </table>
   </card>
+</div>
+<div id="pn_browser" v-if="loaded" style="height: 650px;"  class="col-12">
+   <card :title="statsCards.browser">
+
+<div>
+  <div style="width:500px;height: 300px;float:left">
+    <GenomeCircosBrowser :contigs="assemblyData.contigs" :amr_genes= "resistomeData.hits" :virulome_genes= "virulomeData.hits" :skew="assemblyData.skew"/>
+  </div>
+  <div style="margin-left: 500px;height:300px;">
+    <GenomeBrowser :list_contig="assemblyData.contigs" :knowngene= "annotationData.genes" :GC_skew= "assemblyData.skew" :GC_content="assemblyData.content.array"/>
+  </div>
+  </div>
+   </card>
 </div>
 </div>
 </template>
@@ -285,6 +288,33 @@ export default {
         ];
         datasource_asm.push(data);
       }
+       var datasource_meta = [];
+      for (var key in this.sample_info.metadata) {
+        var data = [
+          key,
+          this.sample_info.metadata[key]
+        ];
+        datasource_meta.push(data);
+      }
+      var metadata_assembly=$('#metadata_table').DataTable({
+        data: datasource_meta,
+      });  
+      var datasource_mlst = [];
+      //console.log(this.mlstData.hits);
+      for (var i=0; i<this.mlstData.hits.length;i++) {
+        var data = [
+          this.mlstData.hits[i].locus,
+          this.mlstData.hits[i].allele
+        ];
+        datasource_mlst.push(data);
+      }
+      var mlst_table=$('#mlst_table').DataTable({
+        data: datasource_mlst,
+        columns: [       
+          { title: "Locus" },
+          { title: "Allele" }        
+        ]
+      });
       var table_assembly=$('#assembly_table').DataTable({
         data:datasource_asm,
         dom: 'Bfrtip',
@@ -299,7 +329,7 @@ export default {
          
         ]
       });  
-      $('#amr_table').DataTable({
+      var amr_table =$('#amr_table').DataTable({
         dom: 'Bfrtip',
         buttons: [
            'csv', 'excel', 'pdf'
@@ -307,7 +337,7 @@ export default {
         initComplete: function () {
             this.api().columns().every( function () {
                 var column = this;
-                console.log(column);
+                //console.log(column);
                 if (column.index()==5 || column.index()==0){
                      var select = $('<select><option value=""></option></select>')
                     .appendTo( $(column.footer()).empty() )
@@ -336,21 +366,54 @@ export default {
         }
       });
 
+      $("#amr_table tbody").on("click", "td.start", function() {
+         var data = amr_table.row($(this)).data();
+       // window.open("/sample/" + data[0]);
+       //router.push({ path: `sample/${data[1]}/${data[0]}`})
+       var ele=data[1].replace('<button data-v-4744e9b6="" type="button" class="btn btn-info btn-sm minibutton">',"").replace("</button>","");
+        EventBus.$emit('element_emited', {contig:data[0],pos:ele});
+        document.getElementById("pn_browser").scrollIntoView();;
+        
+     });
+      $("#amr_table tbody").on("click", "td.end", function() {
+         var data = amr_table.row($(this)).data();
+       // window.open("/sample/" + data[0]);
+       //router.push({ path: `sample/${data[1]}/${data[0]}`})
+       var ele=data[2].replace('<button data-v-4744e9b6="" type="button" class="btn btn-info btn-sm minibutton">',"").replace("</button>","");
+        EventBus.$emit('element_emited', {contig:data[0],pos:ele});
+        document.getElementById("pn_browser").scrollIntoView();;
+        
+     });
 
 
 
-
-
-      $('#virulome_table').DataTable({
+      var vir_table=$('#virulome_table').DataTable({
          dom: 'Bfrtip',
         buttons: [
             'csv', 'excel', 'pdf'
         ]
       });
-
+       $("#virulome_table tbody").on("click", "td.start", function() {
+         var data = vir_table.row($(this)).data();
+       // window.open("/sample/" + data[0]);
+       //router.push({ path: `sample/${data[1]}/${data[0]}`})
+       var ele=data[1].replace('<button data-v-4744e9b6="" type="button" class="btn btn-info btn-sm minibutton">',"").replace("</button>","");
+        EventBus.$emit('element_emited', {contig:data[0],pos:ele});
+        document.getElementById("pn_browser").scrollIntoView();;
+        
+     });
+      $("#virulome_table tbody").on("click", "td.end", function() {
+         var data = vir_table.row($(this)).data();
+       // window.open("/sample/" + data[0]);
+       //router.push({ path: `sample/${data[1]}/${data[0]}`})
+       var ele=data[2].replace('<button data-v-4744e9b6="" type="button" class="btn btn-info btn-sm minibutton">',"").replace("</button>","");
+        EventBus.$emit('element_emited', {contig:data[0],pos:ele});
+        document.getElementById("pn_browser").scrollIntoView();;
+        
+     });
       $('#assembly_table tbody').on('click', "td.sorting_1", function () {
         var data = table_assembly.row( $(this)).data();
-          console.log(data);
+          //console.log(data);
           EventBus.$emit('contig_emited', data[0]);
           if ( $(this).hasClass('selected') ) {
               $(this).removeClass('selected');
@@ -361,33 +424,7 @@ export default {
           }
 
       } );
-      var datasource_meta = [];
-      for (var key in this.sample_info.metadata) {
-        var data = [
-          key,
-          this.sample_info.metadata[key]
-        ];
-        datasource_meta.push(data);
-      }
-      var metadata_assembly=$('#metadata_table').DataTable({
-        data: datasource_meta,
-      });  
-      var datasource_mlst = [];
-      console.log(this.mlstData.hits);
-      for (var i=0; i<this.mlstData.hits.length;i++) {
-        var data = [
-          this.mlstData.hits[i].locus,
-          this.mlstData.hits[i].allele
-        ];
-        datasource_mlst.push(data);
-      }
-      var mlst_table=$('#mlst_table').DataTable({
-        data: datasource_mlst,
-        columns: [       
-          { title: "Locus" },
-          { title: "Allele" }        
-        ]
-      });  
+       
     },
     async fetchData(){
       const ret = await SampleAPI.fetchResult(this.collectionId,this.sampleId);
@@ -422,7 +459,7 @@ export default {
 
         }       
       }
-      console.log(this.annotationData);
+      //console.log(this.annotationData);
       this.sample_info={name:ret.data.name,genus:ret.data.genus,species:ret.data.species,strain:ret.data.strain,gram:ret.data.gram,files:ret.data.files,metadata:ret.data.metadata};
       
       this.loaded=true;

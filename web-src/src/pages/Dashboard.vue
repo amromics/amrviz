@@ -2,7 +2,7 @@
   <div>
      <div class="row">
          <div class="col-12">
-       <h1>AMRVis: A pipelne for baterial genome analysis and visualization</h1>
+       <h1>AMRViz: A pipelne for baterial genome analysis and visualization</h1>
       </div>
     </div>
     <!--Stats cards-->
@@ -42,7 +42,7 @@
       <div class="col-12">
         <card title="Pipeline"
                     sub-title="Diagram">
-        <img class="center_img" :src="`${publicPath}static/pipeline.png`"/>
+        <img class="center_img" style="width:100%" :src="`${publicPath}static/pipeline.png`"/>
         
         </card>
       </div>

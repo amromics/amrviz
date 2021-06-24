@@ -110,7 +110,7 @@ export class Browser {
     this.knowngenes = genes;
     this.gc_skew = skew;
     this.gc_content = content;
-    console.log(this.knowngenes);
+    //console.log(this.knowngenes);
     //this.gc_content_window=content.window;
     //this.gc_content_step=content.step;
     //console.log(contigs)
@@ -292,7 +292,7 @@ export class Browser {
         .style("top", (d3.mouse(this)[1]-100) + "px");
     };
     var mouseleave = function(d) {
-      console.log("mouse leave");
+      //console.log("mouse leave");
       tooltip.style("opacity", 0);
       d3.select(this).style("stroke", "white");
     };

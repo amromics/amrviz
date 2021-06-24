@@ -38,10 +38,15 @@ tr.shown td.details-control {
       <div>Data loading...</div>
     </div>
  
-    <div><h2>Collections</h2></div>
-    <div class="col-12" v-if="isReady">
-      <table id="collection_table" class="display">
-      </table>
+    
+    <div class="col-12" v-if="!isLoading&&isReady">
+     
+      
+        <card title="Collections"
+                    sub-title="List of collections">
+         <table id="collection_table" class="display">
+          </table>
+        </card>
     </div>
   </div>
 </template>
@@ -103,11 +108,12 @@ export default {
           { title: "Name" },
           { title: "Status" },
           {
-            title: "Open",
+           title: "Action",
+            name:"control",
             className: "details-control",
             orderable: false,
             data: null,
-            defaultContent: "Click to open"
+             defaultContent: "<button type=\"button\" class=\"btn btn-success\">Open</button>"
           }
         ]
       });

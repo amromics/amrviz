@@ -30,6 +30,7 @@ tr.shown td.details-control {
 .center {
   text-align: center;
 }
+
 </style>
 <template>
   <div class="row">
@@ -38,11 +39,14 @@ tr.shown td.details-control {
       <div>Data loading...</div>
     </div>
  
-    <div><h2>Samples</h2></div>
-    <div class="col-12" v-if="isReady">
-      <table id="sample_table" class="display">
+ 
+
+        <card title="Samples" v-if="!isLoading&&isReady"
+                    sub-title="List of samples">
+        
+          <table id="sample_table" class="display">
       </table>
-    </div>
+        </card>
   </div>
 </template>
 <script>
@@ -83,7 +87,7 @@ export default {
 
       for (var i=0;i<this.list_collection.length;i++){
         const samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
-        console.log(samples_value);
+        //console.log(samples_value);
         for(var j=0;j<samples_value.data.samples.length;j++){
             var obj=samples_value.data.samples[j];
             obj['collectionID']=this.list_collection[i].collectionID;
@@ -93,7 +97,7 @@ export default {
         
 
       }
-      console.log( this.list_samples);
+      //console.log( this.list_samples);
       this.isLoading = false;
       this.isReady = true;
     },
@@ -123,11 +127,12 @@ export default {
             { title: "Species" },
              { title: "Strain" },
           {
-            title: "Open",
+            title: "Action",
+            name:"control",
             className: "details-control",
             orderable: false,
             data: null,
-            defaultContent: "Click to open"
+             defaultContent: "<button type=\"button\" class=\"btn btn-success\">Open</button>"
           }
         ]
       });
