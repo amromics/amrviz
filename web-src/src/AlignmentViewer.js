@@ -61,7 +61,7 @@ export class AlignmentViewer {
     control_option_display_lenght.setAttribute("type", "checkbox");
     control_option_display_lenght.setAttribute("id", "ch_length");
     control_option_display_lenght.setAttribute("name", "ch_length");
-    control_option_display_lenght.setAttribute("checked", "true");
+    control_option_display_lenght.setAttribute("checked", "false");
     control_option_display_lenght.setAttribute("value", "display");
 
     control_option_display_lenght.addEventListener("change", this.onChangeViewBranchLenght.bind(this));
@@ -71,6 +71,7 @@ export class AlignmentViewer {
     control_option.appendChild(label_checkbox_tree_length);
 
     var control_option_radio_nucl = document.createElement('input');
+    control_option_radio_nucl.setAttribute("style", "margin-left:20px");
     control_option_radio_nucl.setAttribute("type", "radio");
     control_option_radio_nucl.setAttribute("name", "view");
     control_option_radio_nucl.setAttribute("value", "nucl");
@@ -81,6 +82,7 @@ export class AlignmentViewer {
     control_option.appendChild(control_option_radio_nucl);
     control_option.appendChild(label_radio_button_nucl);
     var control_option_radio_prot = document.createElement('input');
+    control_option_radio_prot.setAttribute("style", "margin-left:10px");
     control_option_radio_prot.setAttribute("type", "radio")
     control_option_radio_prot.setAttribute("name", "view")
     control_option_radio_prot.setAttribute("value", "prot")
