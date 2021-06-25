@@ -10,9 +10,9 @@
     <div class="sidebar-wrapper" id="style-3">
       <div class="logo">
         <a href="#" class="simple-text">
-            <div class="logo-img">
+           <!--  <div class="logo-img">
                 <img src="@/assets/img/vue-logo.png" alt="">
-            </div>
+            </div> -->
           {{title}}
         </a>
       </div>

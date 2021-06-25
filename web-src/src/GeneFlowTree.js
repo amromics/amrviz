@@ -53,18 +53,8 @@ export class GeneFlowTree {
     var control_option = document.createElement('div');
     this.control_gene.style.margin = "10px";
     this.control_gene.style.float = "right";
-    var control_option_display_lenght = document.createElement('input');
-    control_option_display_lenght.setAttribute("type", "checkbox");
-    control_option_display_lenght.setAttribute("id", "ch_length");
-    control_option_display_lenght.setAttribute("name", "ch_length");
-    control_option_display_lenght.setAttribute("checked", "true");
-    control_option_display_lenght.setAttribute("value", "display");
-
-    control_option_display_lenght.addEventListener("change", this.onChangeViewBranchLenght.bind(this));
-    control_option.appendChild(control_option_display_lenght);
-    var label_checkbox_tree_length = document.createElement('label');
-    label_checkbox_tree_length.innerHTML = "Display branch lenght";
-    control_option.appendChild(label_checkbox_tree_length);
+   
+    
 
 
 
@@ -144,9 +134,9 @@ export class GeneFlowTree {
     }
     var height=num_leaf*this.cell_size;
     this.container.style.height= (height + 100) + "px";
-    var width_tree = this.props.width /2;
+    var width_tree = (this.props.width-20) /2;
     var distance_per_depth = width_tree / max_depth;
-    var diff=width_tree;
+    var diff=width_tree+20;
     var order=1;
     for (var i =0;i<this.nodes.length;i++){
       if(this.nodes[i].group==1){
@@ -168,7 +158,7 @@ export class GeneFlowTree {
             }
             //console.log(tb);  
             this.nodes[i].fy=tb/map_nodes.get(this.nodes[i].id).length;
-            this.nodes[i].fx=distance_per_depth*d;
+            this.nodes[i].fx=distance_per_depth*d+20;
           }
         }
       }
@@ -433,24 +423,26 @@ export class GeneFlowTree {
     if(node.type==1)
       return node.group === 1 ? '#233e8b' : '#233e8b'
       if(node.type==2)
-      return node.group === 1 ? '#cf0000' : '#cf0000'
+      return node.group === 1 ? '#CD113B' : '#CD113B'
+    if(node.type==0)
+      return '#ffffff00'
   }
 
   getNodeSize(node, neighbors) {
   
     if(node.type==1)
-      return node.group === 1 ? 10 : 12
+      return node.group === 1 ? 10 : 8
       if(node.type==2)
       return node.group === 1 ? 8 : 4
       else
-        return 1;
+        return 5;
   }
   getLinkColor(link) {
-    if(link.type==1) return  '#233e8b';
-    else return  'red'
+    if(link.type==1) return  '#233e8b77';
+    else return  '#CD113B'
   }
   getLinkStroke(link) {
-    if(link.type==1) return  '10';
+    if(link.type==1) return  '12';
     else return '2'
   }
   getTextColor(node, neighbors) {

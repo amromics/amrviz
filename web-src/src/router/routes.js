@@ -19,11 +19,15 @@ const routes = [
     path: "/",
     component: DashboardLayout,
     redirect: "/dashboard",
+    meta: {
+      title: 'Amrviz -Dashboard'
+    },
     children: [
       {
         path: "dashboard",
         name: "dashboard",
         component: Dashboard
+       
       },
       {
         path: "stats",

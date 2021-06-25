@@ -17,15 +17,20 @@
     transform: rotate(360deg);
   }
 }
-.center {
-  position: fixed;
-  left: 50%;
-  top: 50%;
+
+.miniloader{
+  border: 7px solid #f3f3f3; /* Light grey */
+  border-top: 7px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+  display: inline-block;
 }
 </style>
 <template>
   <div>
-    <div id="aligmentview" style="width:100%"></div>
+    <div id="aligmentview" style="width:100%"></div> 
   </div>
 </template>
 <script>
@@ -64,6 +69,7 @@ export default {
    EventBus.$on("gene_id_emited", gene_id => {
         //console.log('gene_id_emited'+gene_id);
         this.loading = true;
+        console.log(this.loading);
         this.reloadAlignment(gene_id);
 
         this.loading = false;

@@ -15,6 +15,15 @@ tr.shown td.details-control {
   animation: spin 2s linear infinite;
   display: inline-block;
 }
+.miniloader{
+  border: 7px solid #f3f3f3; /* Light grey */
+  border-top: 7px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 2s linear infinite;
+  display: inline-block;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -28,6 +37,7 @@ tr.shown td.details-control {
 }
 .center {
   text-align: center;
+  z-index: 100;
 }
 .highlight {
     background-color: whitesmoke !important;
@@ -38,23 +48,21 @@ tr.shown td.details-control {
 </style>
 <template>
   <div>
-    <div class="center" v-if="isLoading">
-      <div class="loader"></div>
-      <div>Data loading...</div>
-    </div>
+    <div  v-if="isLoading" class="loader center"></div>
     <div>
-      <h1>{{collectionId}}</h1>
+      <h1>{{collectionId}}  <div  v-if="!isReady" class="miniloader"></div></h1>
       <!-- <h3>Hsuan-Lin Her, Yu-Wei Wu, A pan-genome-based machine learning approach for predicting antimicrobial resistance activities of the Escherichia coli strains, Bioinformatics, Volume 34, Issue 13, 01 July 2018, Pages i89–i95, https://doi.org/10.1093/bioinformatics/bty276</h3> -->
     </div>
 
-    <div class="row" v-if="isReady">
+    <div class="row" v-if="list_sample">
       <div class="col-12">
-        <card :title="statsCards.samples" :subTitle="statsCards.sample_sub" >
+        <card  :title="statsCards.samples" :subTitle="statsCards.sample_sub" >
           <div slot="raw-content" class="table-responsive pad10">
-           <table id="samples_table" class="display">
+           <table  v-if="list_sample" id="samples_table" class="display">
           </table>
           </div>
         </card>
+      
       </div>
 
 
@@ -67,6 +75,7 @@ tr.shown td.details-control {
             <PangenomePieChart :core_data_url="coreDataURL" />
            </div>
         </card>
+         
       </div>
 
       <div class="col-md-6 col-12">
@@ -85,13 +94,27 @@ tr.shown td.details-control {
            <table id="cluster_table" class="display">
              <thead>
                <tr>
+                 
                   <th>Gene</th>
                   <th>Annotation</th>
                   <th>Number of Isolates</th>
                   <th>Number of sequences</th>
                   <th>Avg Length</th>
+                  <th></th>
               </tr>
     </thead>
+     <tbody>
+    <tr v-for="item in geneClusterData.genes" :key="item.gene">
+       <td >{{item.gene}}</td>
+     
+      <td>{{item.annotation}}</td>
+      <td>{{item.noisolates}}</td>
+      <td>{{item.nosequences}}</td>
+      <td>{{item.length}}</td>
+        <td class="gene"><button type="button" class="btn btn-info btn-sm minibutton">Select</button></td>
+     
+    </tr>
+  </tbody>
           </table>
           </div>
         </card>
@@ -187,9 +210,11 @@ export default {
       coreDataURL: undefined,
       phyloHeatmapURL: undefined,
       alignmentData: undefined,
-      isLoading: true,
+      isLoading: false,
       list_sample: [],
-      isReady: false
+      isReady: false,
+     
+     
     };
   },
   computed: {
@@ -250,7 +275,7 @@ export default {
         this.geneClusterData.genes[i]["id"] = i + 1;
       }
 
-      this.isLoading = false;
+      
       this.isReady = true;
     },
     loadData() {
@@ -295,8 +320,9 @@ export default {
             title: "Metadata",
             className: "details-control",
             orderable: false,
-            data: null,
-            defaultContent: "Click to open"
+            data: null,           
+            name:"control",           
+             defaultContent: "<button type=\"button\" class=\"btn btn-success\">Show</button>"
           }
         ],
         columnDefs: [ 
@@ -344,6 +370,7 @@ export default {
         html += "</table>";
         return html;
       };
+      this.sample_table_ready=true;
       $("#samples_table tbody").on("click", "td.details-control", function() {
         var tr = $(this).closest("tr");
         var row = table.row(tr);
@@ -359,21 +386,9 @@ export default {
           tr.addClass("shown");
         }
       });
-      var datasource_gene_clusters = [];
-      for (var i = 0; i < this.geneClusterData.genes.length; i++) {
-        var data = [
-        
-          this.geneClusterData.genes[i].gene,
-          this.geneClusterData.genes[i].annotation,
-          this.geneClusterData.genes[i].noisolates,
-          this.geneClusterData.genes[i].nosequences,
-          this.geneClusterData.genes[i].length
-        ];
-        datasource_gene_clusters.push(data);
-      }
-      console.log(datasource_gene_clusters);
+     
       var table_clusters = $("#cluster_table").DataTable({
-        data: datasource_gene_clusters,
+     
         dom: 'Bfrtip',
         buttons: [
             'csv', 'excel', 'pdf'
@@ -382,6 +397,7 @@ export default {
       $("#cluster_table tbody").on("click", "tr", function() {
         var data = table_clusters.row($(this)).data();
         console.log("gene_id_emited"+data[0])
+        
         EventBus.$emit("gene_id_emited", data[0]);
         if ($(this).hasClass("selected")) {
           $(this).removeClass("selected");
