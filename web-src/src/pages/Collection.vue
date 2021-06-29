@@ -45,6 +45,7 @@ tr.shown td.details-control {
     font-weight: bold;
     cursor: pointer;
 }
+
 </style>
 <template>
   <div>
@@ -301,7 +302,10 @@ export default {
       var table = $("#samples_table").DataTable({
         data: datasource,
         columns: [
-          { title: "Sample ID" },
+           {
+            title: "SampleID",
+            className: "id_control",
+                 },
           { title: "Name" },
           { title: "Genus" },
           { title: "Species" },
@@ -318,11 +322,19 @@ export default {
 
           {
             title: "Metadata",
-            className: "details-control",
+            className: "meta-control",
             orderable: false,
             data: null,           
             name:"control",           
              defaultContent: "<button type=\"button\" class=\"btn btn-success\">Show</button>"
+          },
+          {
+            title: "Result",
+            className: "go-control",
+            orderable: false,
+            data: null,           
+            name:"control",           
+             defaultContent: "<button type=\"button\" class=\"btn btn-warning\">Go</button>"
           }
         ],
         columnDefs: [ 
@@ -346,9 +358,10 @@ export default {
 
       });
       var collectionId=this.collectionId;
-      $("#samples_table tbody").on("click", "td.sorting_1", function() {
+       $("#samples_table tbody").on("click", "td.go-control", function() {
         var data = table.row($(this)).data();
-        window.open("/sample//"+collectionId+"/" + data[0], "_blank");
+        //router.push({ path: `sample/${data[1]}/${data[0]}`})
+        window.open("/sample/"+collectionId+"/" + data[0], "_blank");
       });
       var childtemplate = function(d) {
         console.log(d);
@@ -371,7 +384,7 @@ export default {
         return html;
       };
       this.sample_table_ready=true;
-      $("#samples_table tbody").on("click", "td.details-control", function() {
+      $("#samples_table tbody").on("click", "td.meta-control", function() {
         var tr = $(this).closest("tr");
         var row = table.row(tr);
 
