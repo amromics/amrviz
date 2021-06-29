@@ -210,10 +210,12 @@ def find_virulome(virulome_file):
 
 
 def find_amr(amr_file):
+    print(amr_file)
     set_amr = set()
     ret = {'hits': []}
     with open(amr_file) as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
+        #print(len(reader))
         for row in reader:
             amr = {}
             set_amr.add(row['RESISTANCE'].strip())
