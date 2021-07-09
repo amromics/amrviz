@@ -52,7 +52,8 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
 
         sample_results = []
         sample_results.append({'group': 'CONTIG', 'data': export_assembly(sample['assembly'])})
-        sample_results.append({'group': 'MLST', 'data': extract_mlst(sample['mlst'])})
+        mlst_info=extract_mlst(sample['mlst'])
+        sample_results.append({'group': 'MLST', 'data': mlst_info})
         sample_results.append({'group': 'VIR', 'data': find_virulome(sample['virulome'])})
         sample_results.append({'group': 'AMR', 'data': find_amr(sample['resistome'])})
         sample_results.append({'group': 'PLASMID', 'data': find_plasmid(sample['plasmid'])})
@@ -62,6 +63,8 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
 
         # TODO: Quang to review if this function stores more than we need
         save_sample_result(sample, exp_dir_current)
+        #add ST to metadata
+        sample['metadata']['MLST']=mlst_info['st']
         web_samples.append({
             'id': sample['id'],
             'name': sample['name'],
