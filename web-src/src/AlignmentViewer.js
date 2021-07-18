@@ -287,7 +287,7 @@ export class AlignmentViewer {
 
     //
     this.fnodes = treemap(nodes);
-    ///console.log(fnodes);
+    //console.log(this.arr_sample_from_tree);
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
@@ -309,7 +309,15 @@ export class AlignmentViewer {
 
   }
   setActiveNames(names){
-    this.active_names=names;
+    //this.active_names=names;
+    //refine activename
+    for (var i =0;i<names.length;i++){
+      for(var j=0;j<this.arr_sample_from_tree.length;j++){
+        if(this.arr_sample_from_tree[j].includes(names[i].replace(/\'/g,'')))
+          this.active_names.push(this.arr_sample_from_tree[j]);
+
+      }
+    }
     this.drawHighlighTree();
   }
 

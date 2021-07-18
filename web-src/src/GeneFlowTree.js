@@ -4,8 +4,8 @@ import {
   NewickTools
 } from "newick";
 export class GeneFlowTree {
-  nodes=[];
-  links=[];
+  nodes = [];
+  links = [];
   constructor(element) {
     this.container = element;
     this.props = {
@@ -53,8 +53,8 @@ export class GeneFlowTree {
     var control_option = document.createElement('div');
     this.control_gene.style.margin = "10px";
     this.control_gene.style.float = "right";
-   
-    
+
+
 
 
 
@@ -67,9 +67,10 @@ export class GeneFlowTree {
 
     this.active_names = [];
     this.display_branch_length = true;
-    this.nodes=[];
-    this.links=[];
-    this.cell_size=40;
+    this.nodes = [];
+    this.links = [];
+    this.allele_links = [];
+    this.cell_size = 80;
   }
 
   load(genelabel, species_tree, gene_tree) {
@@ -98,19 +99,19 @@ export class GeneFlowTree {
     var num_leaf = 0;
     this.node_leaf = [];
     this.arr_sample_from_tree = [];
-    this.nodes=[];
-    this.links=[];
+    this.nodes = [];
+    this.links = [];
     var max_heigth = 0;
     var max_depth = 0;
-    let map_nodes=new Map();
+    let map_nodes = new Map();
     while (stack.length > 0) {
       var n = stack.pop();
       n.id = count;
       count++;
-      var newnode={ id: n.id, group: 0,type:1, label: n.data.name, level: n.depth };
+      var newnode = { id: n.id, group: 0, type: 1, label: n.data.name, level: n.depth };
       if (n.children != undefined) {
-       
-        map_nodes.set(n.id,[]);
+
+        map_nodes.set(n.id, []);
         for (var i = 0; i < n.children.length; i++) {
           stack.push(n.children[i]);
           n.children[i].height = n.height + n.children[i].data.length;
@@ -118,165 +119,184 @@ export class GeneFlowTree {
       } else {
         if (n.height > max_heigth) max_heigth = n.height;
         if (n.depth > max_depth) max_depth = n.depth;
-        
-        newnode.group=1;
+
+        newnode.group = 1;
         this.node_leaf.push(newnode);
         num_leaf++;
       }
-      this.nodes.push( newnode);
-      if(n.parent!=null){
-        this.links.push({ target: n.parent.id,type:1, source: n.id, strength: 0.0 });
-        let arr=map_nodes.get(n.parent.id);
+      this.nodes.push(newnode);
+      if (n.parent != null) {
+        this.links.push({ target: n.parent.id, type: 1, source: n.id, strength: 0.0 });
+        let arr = map_nodes.get(n.parent.id);
         arr.push(newnode);
-        map_nodes.set(n.parent.id,arr);
+        map_nodes.set(n.parent.id, arr);
       }
-        
+
     }
-    var height=num_leaf*this.cell_size;
-    this.container.style.height= (height + 100) + "px";
-    var width_tree = (this.props.width-20) /2;
+    var height = num_leaf * this.cell_size;
+    this.container.style.height = (height + 100) + "px";
+    var width_tree = (this.props.width - 20) / 2;
     var distance_per_depth = width_tree / max_depth;
-    var diff=width_tree+20;
-    var order=1;
-    for (var i =0;i<this.nodes.length;i++){
-      if(this.nodes[i].group==1){
-        this.nodes[i].fx=diff;
-        this.nodes[i].fy=order*this.cell_size;
-        order=order+1;
+    var diff = width_tree + 20;
+    var order = 1;
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (this.nodes[i].group == 1) {
+        this.nodes[i].fx = diff;
+        this.nodes[i].fy = order * this.cell_size;
+        order = order + 1;
       }
     }
     //console.log(map_nodes);
-    
-    for (var d=max_depth;d>=0;d--){
-      for (var i =0;i<this.nodes.length;i++){
+
+    for (var d = max_depth; d >= 0; d--) {
+      for (var i = 0; i < this.nodes.length; i++) {
         //console.log(this.nodes[i]);
-        if(this.nodes[i].group==0){
-          if(this.nodes[i].level==d){
-            var tb=0;
-            for (var c=0;c<map_nodes.get(this.nodes[i].id).length;c++){   
-              tb=tb+map_nodes.get(this.nodes[i].id)[c].fy;
+        if (this.nodes[i].group == 0) {
+          if (this.nodes[i].level == d) {
+            var tb = 0;
+            for (var c = 0; c < map_nodes.get(this.nodes[i].id).length; c++) {
+              tb = tb + map_nodes.get(this.nodes[i].id)[c].fy;
             }
             //console.log(tb);  
-            this.nodes[i].fy=tb/map_nodes.get(this.nodes[i].id).length;
-            this.nodes[i].fx=distance_per_depth*d+20;
+            this.nodes[i].fy = tb / map_nodes.get(this.nodes[i].id).length;
+            this.nodes[i].fx = distance_per_depth * d + 20;
           }
         }
       }
     }
-    
+
     //estimate length of sample name, by average length plus 10
     var newick_gene = NewickTools.parse(gene_tree);
     let nodes_gene = d3.hierarchy(newick_gene, d => d.branchset);
     console.log(nodes_gene);
     stack = [];
-    var list_node_gene=[];
+    var list_node_gene = [];
     nodes_gene.height = 0;
     stack.push(nodes_gene);
-    
+
     var num_leaf = 0;
-    
+
     var max_depth_gene = 0;
-    map_nodes=new Map();
+    map_nodes = new Map();
     while (stack.length > 0) {
       var n = stack.pop();
       n.id = count;
       count++;
-      var newnode={ id: n.id, group: 0,type:2, label: n.data.name, level: n.depth };
+      var newnode = { id: n.id, group: 0, type: 2, label: n.data.name, level: n.depth };
       if (n.children != undefined) {
-       
-        map_nodes.set(n.id,[]);
+
+        map_nodes.set(n.id, []);
         for (var i = 0; i < n.children.length; i++) {
           stack.push(n.children[i]);
           n.children[i].height = n.height + n.children[i].data.length;
         }
       } else {
-        
+
         if (n.depth > max_depth_gene) max_depth_gene = n.depth;
-        
-        newnode.group=1;
-       
-       
+
+        newnode.group = 1;
+
+
       }
-      list_node_gene.push( newnode);
-      if(n.parent!=null){
-        this.links.push({ target: n.parent.id, type:2,source: n.id, strength: 0.0 });
-        let arr=map_nodes.get(n.parent.id);
+      list_node_gene.push(newnode);
+      if (n.parent != null) {
+        this.links.push({ target: n.parent.id, type: 2, source: n.id, strength: 0.0 });
+        let arr = map_nodes.get(n.parent.id);
         arr.push(newnode);
-        map_nodes.set(n.parent.id,arr);
+        map_nodes.set(n.parent.id, arr);
       }
     }
     distance_per_depth = width_tree / max_depth_gene;
-    var order=1;
-    for (var i =0;i<list_node_gene.length;i++){
-      for(var j =0;j<this.node_leaf.length;j++){
-        var sample_name=list_node_gene[i].label.substring(0,list_node_gene[i].label.lastIndexOf("_"));
+    var order = 1;
+    for (var j = 0; j < this.node_leaf.length; j++) {
+      var num_child = 0
+      for (var i = 0; i < list_node_gene.length; i++) {
+
+        var sample_name = list_node_gene[i].label.substring(0, list_node_gene[i].label.lastIndexOf("_"));
         //console.log(sample_name);
-        
-        if(list_node_gene[i].group==1&&this.node_leaf[j].label==sample_name){
-         // console.log("found match");
-          list_node_gene[i].fx=this.node_leaf[j].fx;
-          list_node_gene[i].fy=this.node_leaf[j].fy;
-          order=order+1;
+
+        if (list_node_gene[i].group == 1 && this.node_leaf[j].label == sample_name) {
+          // console.log("found match");
+          num_child++;
+
         }
       }
-      
+      var count_gene = 0;
+      var t = num_child / 2 + 0.5;
+      var step_y = this.cell_size / num_child;
+      console.log(count_gene + "," + t + "," + step_y);
+      for (var i = 0; i < list_node_gene.length; i++) {
+
+        var sample_name = list_node_gene[i].label.substring(0, list_node_gene[i].label.lastIndexOf("_"));
+        //console.log(sample_name);
+
+        if (list_node_gene[i].group == 1 && this.node_leaf[j].label == sample_name && num_child > 0) {
+          // console.log("found match");
+          count_gene++;
+          list_node_gene[i].fx = this.node_leaf[j].fx + 100;
+          list_node_gene[i].fy = this.node_leaf[j].fy + (count_gene - t) * step_y;
+          this.allele_links.push({ target: this.node_leaf[j].id, type: 2, source: list_node_gene[i].id, strength: 0.0 });
+          order = order + 1;
+        }
+      }
+
     }
-    for (var d=max_depth_gene;d>=0;d--){
-      for (var i =0;i<list_node_gene.length;i++){
+    for (var d = max_depth_gene; d >= 0; d--) {
+      for (var i = 0; i < list_node_gene.length; i++) {
         //console.log(this.nodes[i]);
-        if(list_node_gene[i].group==0){
-          if(list_node_gene[i].level==d){
-            var tb=0;
-            for (var c=0;c<map_nodes.get(list_node_gene[i].id).length;c++){   
-              tb=tb+map_nodes.get(list_node_gene[i].id)[c].fy;
+        if (list_node_gene[i].group == 0) {
+          if (list_node_gene[i].level == d) {
+            var tb = 0;
+            for (var c = 0; c < map_nodes.get(list_node_gene[i].id).length; c++) {
+              tb = tb + map_nodes.get(list_node_gene[i].id)[c].fy;
             }
             //console.log(tb);  
-            list_node_gene[i].fy=tb/map_nodes.get(list_node_gene[i].id).length;
-            list_node_gene[i].fx=2*(width_tree)-distance_per_depth*d;
+            list_node_gene[i].fy = tb / map_nodes.get(list_node_gene[i].id).length;
+            list_node_gene[i].fx = 2 * (width_tree) - distance_per_depth * d;
           }
         }
       }
-    }  
-    
-    
+    }
+
+
     //console.log(map_nodes);
-    
-  
+
+
     Array.prototype.push.apply(this.nodes, list_node_gene)
     console.log(this.nodes);
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
     //var height_rect = height / node_leaf.length / 2;
-    this.make_square_view(this.nodes,this.links);
+    this.make_square_view(this.nodes, this.links);
 
   }
-  getChildNodes(parentNode, linkes){
+  getChildNodes(parentNode, linkes) {
 
-      for (var i =0;i<this.links.length;i++){
+    for (var i = 0; i < this.links.length; i++) {
 
-      }
-  }
-  make_square_view(nodes, links){
-    var square_links=[];
-    var middle_nodes=[];
-    for(var i=0;i<links.length;i++){
-        var source_node;
-        var target_node;
-        for(var j=0;j<nodes.length;j++){
-          if(links[i].source==nodes[j].id)
-            source_node=nodes[j];
-          if(links[i].target==nodes[j].id)
-            target_node=nodes[j];        
-        }
-        var midder_node={ id: source_node.id+"_"+target_node.id, group: source_node.group,type:0, label: "", level: source_node.level };
-        midder_node.fx=target_node.fx;
-        midder_node.fy=source_node.fy;
-        middle_nodes.push(midder_node);
-        square_links.push({ target:midder_node.id , type:links[i].type,source: source_node.id, strength: 0.0 });
-        square_links.push({ target:target_node, type:links[i].type,source: midder_node.id, strength: 0.0 });
     }
-    this.links=square_links;
+  }
+  make_square_view(nodes, links) {
+    var square_links = [];
+    var middle_nodes = [];
+    for (var i = 0; i < links.length; i++) {
+      var source_node;
+      var target_node;
+      for (var j = 0; j < nodes.length; j++) {
+        if (links[i].source == nodes[j].id)
+          source_node = nodes[j];
+        if (links[i].target == nodes[j].id)
+          target_node = nodes[j];
+      }
+      var midder_node = { id: source_node.id + "_" + target_node.id, group: source_node.group, type: 0, label: "", level: source_node.level };
+      midder_node.fx = target_node.fx;
+      midder_node.fy = source_node.fy;
+      middle_nodes.push(midder_node);
+      square_links.push({ target: midder_node.id, type: links[i].type, source: source_node.id, strength: 0.0 });
+      square_links.push({ target: target_node, type: links[i].type, source: midder_node.id, strength: 0.0 });
+    }
+    this.links = square_links;
 
     Array.prototype.push.apply(nodes, middle_nodes)
 
@@ -301,9 +321,9 @@ export class GeneFlowTree {
   }
 
   draw() {
-    
-    var width =  this.props.width  ,
-      height =  this.container.style.height;
+
+    var width = this.props.width,
+      height = this.container.style.height;
     this.treeview.innerHTML = "";
     var svg = d3.select("#amr_gf_treeview").append("svg")
       .attr("width", width)
@@ -331,8 +351,8 @@ export class GeneFlowTree {
       if (!d3.event.active) {
         simulation.alphaTarget(0)
       }
-     
-      node.fixed=true
+
+      node.fixed = true
     })
     this.linkElements = svg.append("g")
       .attr("class", "links")
@@ -340,65 +360,78 @@ export class GeneFlowTree {
       .data(this.links)
       .enter().append("line")
       .attr("stroke-width", this.getLinkStroke)
-      .attr("stroke-linecap","round")
+      .attr("stroke-linecap", "round")
       .attr("stroke", this.getLinkColor)
-
-      this.nodeElements = svg.append("g")
+    this.linkAlleleElements = svg.append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(this.allele_links)
+      .enter().append("line")
+      .attr("stroke-width", 1)
+      .attr("stroke-linecap", "round")
+      .attr("stroke", "#333333")
+    this.nodeElements = svg.append("g")
       .attr("class", "nodes")
       .selectAll("circle")
       .data(this.nodes)
       .enter().append("circle")
-      .attr("r",this.getNodeSize)
+      .attr("r", this.getNodeSize)
       .attr("fill", this.getNodeColor)
       .call(dragDrop)
       .on('click', this.selectNode.bind(this))
 
-      this.textElements = svg.append("g")
+    this.textElements = svg.append("g")
       .attr("class", "texts")
       .selectAll("text")
       .data(this.nodes)
       .enter().append("text")
       .text(function (node) { return node.label })
-      .attr("font-size", 12)
-      .attr("dx", -10)
-      .attr("dy", 25)
+      .attr("font-size", function (node) { return node.type == 1 ? 12 : 9 })
+      .attr("dx", 10)
+      .attr("dy", function (node) { return node.type == 1 ? 2 : 10 })
 
     simulation.nodes(this.nodes).on('tick', () => {
       this.nodeElements
         .attr('cx', function (node) { return node.x })
         .attr('cy', function (node) { return node.y })
-        this.textElements
+      this.textElements
         .attr('x', function (node) { return node.x })
         .attr('y', function (node) { return node.y })
-        this.linkElements
+      this.linkElements
+        .attr('x1', function (link) { return link.source.x })
+        .attr('y1', function (link) { return link.source.y })
+        .attr('x2', function (link) { return link.target.x })
+        .attr('y2', function (link) { return link.target.y })
+      this.linkAlleleElements
         .attr('x1', function (link) { return link.source.x })
         .attr('y1', function (link) { return link.source.y })
         .attr('x2', function (link) { return link.target.x })
         .attr('y2', function (link) { return link.target.y })
     });
     simulation.force("link").links(this.links);
+    simulation.force("link").links(this.allele_links);
   }
   selectNode(selectedNode) {
-   /*  
-    var neighbors =this.getNeighborNodes(selectedNode);
-
-    // we modify the styles to highlight selected nodes
-    this.nodeElements.attr('fill', function (node) {  
-      if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
-        return node.level === 1 ? 'blue' : 'blue'
-      }
-  
-      return node.level === 1 ? 'red' : 'red'
-    })
-    this.textElements.attr('fill', function (node) {
-      return Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1 ? 'green' : 'black' 
-    })
-   this.linkElements.attr('stroke', function (link) { 
-      return link.target.id === selectedNode.id || link.source.id === selectedNode.id ? 'green' : '#E5E5E5'
-    }) */
+    /*  
+     var neighbors =this.getNeighborNodes(selectedNode);
+ 
+     // we modify the styles to highlight selected nodes
+     this.nodeElements.attr('fill', function (node) {  
+       if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
+         return node.level === 1 ? 'blue' : 'blue'
+       }
+   
+       return node.level === 1 ? 'red' : 'red'
+     })
+     this.textElements.attr('fill', function (node) {
+       return Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1 ? 'green' : 'black' 
+     })
+    this.linkElements.attr('stroke', function (link) { 
+       return link.target.id === selectedNode.id || link.source.id === selectedNode.id ? 'green' : '#E5E5E5'
+     }) */
   }
   getNeighborNodes(node) {
-   
+
     return this.links.reduce(function (neighbors, link) {
       if (link.target.id === node.id) {
         neighbors.push(link.source.id)
@@ -420,29 +453,29 @@ export class GeneFlowTree {
     if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
       return node.level === 1 ? '#5233e8b' : 'green'
     }
-    if(node.type==1)
+    if (node.type == 1)
       return node.group === 1 ? '#233e8b' : '#233e8b'
-      if(node.type==2)
+    if (node.type == 2)
       return node.group === 1 ? '#CD113B' : '#CD113B'
-    if(node.type==0)
+    if (node.type == 0)
       return '#ffffff00'
   }
 
   getNodeSize(node, neighbors) {
-  
-    if(node.type==1)
+
+    if (node.type == 1)
       return node.group === 1 ? 10 : 8
-      if(node.type==2)
-      return node.group === 1 ? 8 : 4
-      else
-        return 5;
+    if (node.type == 2)
+      return node.group === 1 ? 4 : 3
+    else
+      return 5;
   }
   getLinkColor(link) {
-    if(link.type==1) return  '#233e8b77';
-    else return  '#CD113B'
+    if (link.type == 1) return '#233e8b77';
+    else return '#CD113B'
   }
   getLinkStroke(link) {
-    if(link.type==1) return  '12';
+    if (link.type == 1) return '12';
     else return '2'
   }
   getTextColor(node, neighbors) {

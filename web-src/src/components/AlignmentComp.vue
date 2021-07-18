@@ -75,7 +75,7 @@ export default {
         this.loading = false;
       });
       EventBus.$on("samples_emited", arr_ids => {
-        //console.log('sample_emited '+arr_ids);
+        console.log('sample_emited '+arr_ids);
         this.loading = true;
 
         this.alignmentview.setActiveNames(arr_ids);

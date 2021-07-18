@@ -78,8 +78,6 @@ export class Phylogeny {
     var list_color_template=[
       "green",
       "red",
-      "yellow",
-
       "peru",
       "chocolate",
       "pink",
