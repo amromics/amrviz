@@ -53,6 +53,10 @@ npm install -g live-server
 npm install
 npm run build --modern
 ```
+## Build docker images
+```bash
+docker build -f Dockerfile -t amrviz .
+```
 
 ## Usage
 
