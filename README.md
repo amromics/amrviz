@@ -135,7 +135,7 @@ Please check the sample input file *data/samples/set1.tsv* for an example.
 -->
 ## Usage with docker
 ### Prepare folder structure
-AMRVIz need to mount 4 folder : downloaded database folder, examples folder (input folder), output folder, web-app working folder. For first time running, keep database,output and web-app data folders are empty. Organize input files and tsv files listing samples in examples folder with (like examples folder in git repo). While using AMRVIZ, do not modify database folder and web-app folder. 
+AMRVIz need to mount 4 folders : downloaded database folder, examples folder (input folder), output folder, web-app working folder. For first time running, keep database,output and web-app data folders are empty. Organize input files and tsv files listing samples in examples folder (like examples folder in git repo). While using AMRVIZ, do not modify database folder and web-app folder. 
  
 ### To run the pipeline
 
