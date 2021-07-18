@@ -144,4 +144,6 @@ docker run -it -v /path/to/db:/misc/db -v /path/to/examples:/misc/examples -v  /
 
 ```
 ### To run the web application
+```bash
 docker run -it -v  /path/to/web-app/data:/misc/amromics/amrviz/web-app/static/data --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amromics/amrviz/web-app
+```
