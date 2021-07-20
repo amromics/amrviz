@@ -140,8 +140,7 @@ AMRVIz need to mount 4 folders : downloaded database folder, examples folder (in
 ### To run the pipeline
 
 ```bash
-docker run -it -v /path/to/db:/misc/db -v /path/to/examples:/misc/examples -v  /path/to/output/data:/misc/amromics/amrviz/data -v  /path/to/web-app/data:/misc/amromics/amrviz/web-app/static/data amrviz amrviz.py pa --time-log k24_time.log  -t 7 -m 25 -c KpClinicalGRBZ4 -i /misc/examples/Kp24/config_Kp4.tsv --work-dir /misc/amromics/amrviz/data/work --webapp-dir /misc/amromics/amrviz/web-app  -n "Collection of 4 clinical isolates from Greek and Brazil"
-
+docker run -it -v `pwd`:/misc/amrviz -w /misc/amrviz amrviz amrviz.py pa -t 7 -m 25 -c KpClinicalGRBZ4 -i /misc/amrviz/examples/Kp24/config_Kp4.tsv --work-dir /misc/amrviz/data/work --webapp-dir /misc/amrviz/web-app  -n "Collection of 4 clinical isolates from Greek and Brazil"
 ```
 ### To run the web application
 ```bash
