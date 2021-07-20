@@ -138,11 +138,11 @@ Please check the sample input file *data/samples/set1.tsv* for an example.
 AMRVIz need to mount 4 folders : downloaded database folder, examples folder (input folder), output folder, web-app working folder. For first time running, keep database,output and web-app data folders are empty. Organize input files and tsv files listing samples in examples folder (like examples folder in git repo). While using AMRVIZ, do not modify database folder and web-app folder. 
  
 ### To run the pipeline
-
+From the amrviz repository directory, run
 ```bash
 docker run -it -v `pwd`:/misc/amrviz -w /misc/amrviz amrviz amrviz.py pa -t 7 -m 25 -c KpClinicalGRBZ4 -i /misc/amrviz/examples/Kp24/config_Kp4.tsv --work-dir /misc/amrviz/data/work --webapp-dir /misc/amrviz/web-app  -n "Collection of 4 clinical isolates from Greek and Brazil"
 ```
 ### To run the web application
 ```bash
-docker run -it -v  /path/to/web-app/data:/misc/amromics/amrviz/web-app/static/data --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amromics/amrviz/web-app
+docker run  -v `pwd`:/misc/amrviz --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amrviz/web-app
 ```
