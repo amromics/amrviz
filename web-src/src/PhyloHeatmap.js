@@ -309,6 +309,17 @@ export class PhyloHeatmap {
         }
         
       })
+      .style("fill", function(d) {
+        //console.log(d);
+        if(highlight_genes.has(d)){
+         
+          return "blue";
+        }
+        else{
+          //console.log("no bold"+d);
+          return "black";
+        }
+      })
      ;
     var selected_samples=this.active_names;
     var y_data=this.arr_sample_from_tree.slice();

@@ -70,7 +70,7 @@ export class GeneFlowTree {
     this.nodes = [];
     this.links = [];
     this.allele_links = [];
-    this.cell_size = 80;
+    this.cell_size = 40;
   }
 
   load(genelabel, species_tree, gene_tree) {
@@ -101,6 +101,7 @@ export class GeneFlowTree {
     this.arr_sample_from_tree = [];
     this.nodes = [];
     this.links = [];
+    this.allele_links=[];
     var max_heigth = 0;
     var max_depth = 0;
     let map_nodes = new Map();
@@ -133,19 +134,84 @@ export class GeneFlowTree {
       }
 
     }
-    var height = num_leaf * this.cell_size;
-    this.container.style.height = (height + 100) + "px";
+    //
+     //estimate length of sample name, by average length plus 10
+     var newick_gene = NewickTools.parse(gene_tree);
+     let nodes_gene = d3.hierarchy(newick_gene, d => d.branchset);
+     console.log(nodes_gene);
+     stack = [];
+     var list_node_gene = [];
+     nodes_gene.height = 0;
+     stack.push(nodes_gene);
+ 
+     var num_leaf_gene = 0;
+ 
+     var max_depth_gene = 0;
+    var map_nodes_gene = new Map();
+     while (stack.length > 0) {
+       var n = stack.pop();
+       n.id = count;
+       count++;
+       var newnode = { id: n.id, group: 0, type: 2, label: n.data.name, level: n.depth };
+       if (n.children != undefined) {
+ 
+        map_nodes_gene.set(n.id, []);
+         for (var i = 0; i < n.children.length; i++) {
+           stack.push(n.children[i]);
+           n.children[i].height = n.height + n.children[i].data.length;
+         }
+       } else {
+ 
+         if (n.depth > max_depth_gene) max_depth_gene = n.depth;
+ 
+         newnode.group = 1;
+ 
+ 
+       }
+       list_node_gene.push(newnode);
+       if (n.parent != null) {
+         this.links.push({ target: n.parent.id, type: 2, source: n.id, strength: 0.0 });
+         let arr = map_nodes_gene.get(n.parent.id);
+         arr.push(newnode);
+         map_nodes_gene.set(n.parent.id, arr);
+       }
+     }
+    //
+    
     var width_tree = (this.props.width - 20) / 2;
     var distance_per_depth = width_tree / max_depth;
     var diff = width_tree + 20;
     var order = 1;
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].group == 1) {
+        var num_child = 0
+        for (var j = 0; j< list_node_gene.length; j++) {
+
+          var sample_name = list_node_gene[j].label.substring(0, list_node_gene[j].label.lastIndexOf("_"));
+       
+
+          if (list_node_gene[j].group == 1 && this.nodes[i].label == sample_name) {
+          // console.log("found match");
+            num_child++;
+
+          }
+        }
         this.nodes[i].fx = diff;
-        this.nodes[i].fy = order * this.cell_size;
-        order = order + 1;
+
+       
+        if(num_child>1){
+          
+          this.nodes[i].fy = (order * this.cell_size+ (order+num_child)* this.cell_size)/2;
+          order=order+num_child+1;
+        }        
+        else{
+          this.nodes[i].fy = order * this.cell_size;
+          order = order+1;
+        }
       }
     }
+    var height = order * this.cell_size;
+    this.container.style.height = (height + 100) + "px";
     //console.log(map_nodes);
 
     for (var d = max_depth; d >= 0; d--) {
@@ -165,48 +231,9 @@ export class GeneFlowTree {
       }
     }
 
-    //estimate length of sample name, by average length plus 10
-    var newick_gene = NewickTools.parse(gene_tree);
-    let nodes_gene = d3.hierarchy(newick_gene, d => d.branchset);
-    console.log(nodes_gene);
-    stack = [];
-    var list_node_gene = [];
-    nodes_gene.height = 0;
-    stack.push(nodes_gene);
-
-    var num_leaf = 0;
-
-    var max_depth_gene = 0;
-    map_nodes = new Map();
-    while (stack.length > 0) {
-      var n = stack.pop();
-      n.id = count;
-      count++;
-      var newnode = { id: n.id, group: 0, type: 2, label: n.data.name, level: n.depth };
-      if (n.children != undefined) {
-
-        map_nodes.set(n.id, []);
-        for (var i = 0; i < n.children.length; i++) {
-          stack.push(n.children[i]);
-          n.children[i].height = n.height + n.children[i].data.length;
-        }
-      } else {
-
-        if (n.depth > max_depth_gene) max_depth_gene = n.depth;
-
-        newnode.group = 1;
-
-
-      }
-      list_node_gene.push(newnode);
-      if (n.parent != null) {
-        this.links.push({ target: n.parent.id, type: 2, source: n.id, strength: 0.0 });
-        let arr = map_nodes.get(n.parent.id);
-        arr.push(newnode);
-        map_nodes.set(n.parent.id, arr);
-      }
-    }
-    distance_per_depth = width_tree / max_depth_gene;
+   
+    //width_tree=width_tree-100;
+    distance_per_depth =( width_tree-100) / max_depth_gene;
     var order = 1;
     for (var j = 0; j < this.node_leaf.length; j++) {
       var num_child = 0
@@ -223,7 +250,7 @@ export class GeneFlowTree {
       }
       var count_gene = 0;
       var t = num_child / 2 + 0.5;
-      var step_y = this.cell_size / num_child;
+      var step_y = this.cell_size ;
       console.log(count_gene + "," + t + "," + step_y);
       for (var i = 0; i < list_node_gene.length; i++) {
 
@@ -247,12 +274,12 @@ export class GeneFlowTree {
         if (list_node_gene[i].group == 0) {
           if (list_node_gene[i].level == d) {
             var tb = 0;
-            for (var c = 0; c < map_nodes.get(list_node_gene[i].id).length; c++) {
-              tb = tb + map_nodes.get(list_node_gene[i].id)[c].fy;
+            for (var c = 0; c < map_nodes_gene.get(list_node_gene[i].id).length; c++) {
+              tb = tb + map_nodes_gene.get(list_node_gene[i].id)[c].fy;
             }
             //console.log(tb);  
-            list_node_gene[i].fy = tb / map_nodes.get(list_node_gene[i].id).length;
-            list_node_gene[i].fx = 2 * (width_tree) - distance_per_depth * d;
+            list_node_gene[i].fy = tb / map_nodes_gene.get(list_node_gene[i].id).length;
+            list_node_gene[i].fx = 2*(width_tree-50)- distance_per_depth * d+100;
           }
         }
       }
@@ -369,7 +396,7 @@ export class GeneFlowTree {
       .enter().append("line")
       .attr("stroke-width", 1)
       .attr("stroke-linecap", "round")
-      .attr("stroke", "#333333")
+      .attr("stroke", "#66666666")
     this.nodeElements = svg.append("g")
       .attr("class", "nodes")
       .selectAll("circle")

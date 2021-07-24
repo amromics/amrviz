@@ -78,32 +78,16 @@ export class Phylogeny {
     var list_color_template=[
       "green",
       "red",
-      "peru",
-      "chocolate",
-      "pink",
-      "#C83200",
-      "#CD3700",
-      "#FF6103",
-      "#CC7722",
-      "#FD6302",
-      "#883000",
-      "#FFBF00",
-      "gold",
-      "#CF9812A",
-      "coral",
-      "pumpkin",
+      
+      "#173f5f",
+      "#20639b",
+      "#3caea3",
+      "gold", 
       "tomato",
       "brown",
-      "vermilion",
-      "orange red",
-      "orange",
-      "crimson",
-      "dark red",
-      "hot pink",
-      "smitten",
       "magenta",
-      "indigo",
-      "blue violet"
+      "indigo"
+     
     ];
     for(var id in this.metadata){
         for (var column in this.metadata[id]){
@@ -186,6 +170,7 @@ export class Phylogeny {
     for(var i=0;i<this.tree.leaves.length;i++){
       var nodeid=this.tree.leaves[i].id.replace(/\'/g,'');
       //console.log(this.metadata[nodeid][metadata_name]);
+      this.tree.leaves[i].data={meta:this.metadata[nodeid][metadata_name]};
       this.tree.leaves[i].setDisplay({
         colour:  this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
         shape: 'circle', // or square, triangle, star
@@ -193,7 +178,7 @@ export class Phylogeny {
         leafStyle: {
           strokeStyle: '#000000',
           fillStyle: this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
-          lineWidth: 1,
+          lineWidth: 0,
         },
         labelStyle: {
           colour: this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
@@ -213,6 +198,16 @@ export class Phylogeny {
       box.style.float="left";
       box.style.marginRight="3px";
       box.style.backgroundColor=this.metadata_style[metadata_name][value];
+      box.setAttribute("data-meta", value)  ;
+      box.addEventListener("click",this.hightlightLeaves.bind(this,event,metadata_name,value));
+      ///////////////box.addEventListener("onmouseleave",this.unhightlightLeaves.bind(this,event,box.getAttribute("data-meta")));
+      box.addEventListener("mouseover", function(){
+        console.log("mouseover");
+        this.style.border="2px solid #000000 ";
+      }, false);
+      box.addEventListener("mouseout", function(){
+        this.style.border="0px";
+      }, false);
       var text = document.createElement('div');
       text.innerHTML=(value=="")?"undefined":value;
       text.style.float="left";
@@ -227,5 +222,53 @@ export class Phylogeny {
     }
     this.legend_container.style.height="100px";
   }
+  hightlightLeaves(event,metadata_name,value){
+   // var metavalue=event.target.getAttribute("data-meta");
+   var metavalue=value;
+    console.log("hightligh:"+metavalue);
+    for(var i=0;i<this.tree.leaves.length;i++){
+      var nodeid=this.tree.leaves[i].id.replace(/\'/g,'');
+      //console.log(this.metadata[nodeid][metadata_name]);
+      //console.log(this.tree.leaves[i].data);
+      if (metavalue==this.tree.leaves[i].data.meta){
+        console.log(this.tree.leaves[i].data.meta);
+        this.tree.leaves[i].setDisplay({
+          colour:  this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
+          shape: 'circle', // or square, triangle, star
+          size: 1.5, // ratio of the base node size
+          leafStyle: {
+            strokeStyle: '#000000',
+            fillStyle: this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
+            lineWidth: 1,
+          },
+          labelStyle: {
+            colour:  '#000000',
+            textSize: 25, // points
+            font: 'Arial',
+            format: 'bold',
+          },
+        });
+      }
+     
+      else
+      this.tree.leaves[i].setDisplay({
+        colour:  this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
+        shape: 'circle', // or square, triangle, star
+        size: 1, // ratio of the base node size
+        leafStyle: {
+          strokeStyle: '#000000',
+          fillStyle: this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
+          lineWidth: 0,
+        },
+        labelStyle: {
+          colour: this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
+          textSize: 20, // points
+          font: 'Arial',
+          format: 'bold',
+        },
+      });
+    }
+  }
+ 
 }
 export default Phylogeny
