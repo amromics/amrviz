@@ -126,7 +126,7 @@ to the web-app for visualization:
 
 ### Usage with docker
 For using docker, please replace the command `./amrviz.py` by 
-`docker run -v `pwd`:/misc/amrviz --publish 3000:3000 amrviz amrviz.py`. For example
+`docker run -v ``pwd``:/misc/amrviz --publish 3000:3000 amrviz amrviz.py`. For example
 
 To start the web-server
 ```bash
