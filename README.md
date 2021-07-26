@@ -73,11 +73,9 @@ To use AMRViz docker, make sure that docker is installed on your system.
 
 ## Usage
 
-AMR-viz comprises two components: a web application and an analysis pipeline. 
+AMR-viz comprises two components: a web application and an analysis pipeline. To start
+the web server, run the following command from **amrviz** root directory 
 
-### To run the web application
-Change the current working directory to the **amrviz** cloned directory 
-in the step 4 of Intallation above.
 ```bash
 ./amrviz.py start [-p 3000] [--webapp-dir web-app]
 ```
@@ -85,11 +83,11 @@ in the step 4 of Intallation above.
 The web application is auto opened on the URL **localhost:3000** (or another 
 port if this port is occupied). 
 
-### To run the pipeline
+To run the pipeline, users need to provide a tsv file listing the samples and input
+data in either fastq (sequencing reads) or fasta (assemply). We provide the following
+examples:
 
-### Examples
-
-#### Miniature dataset
+#### Miniature dataset example
 
 We prepare a small dataset consisting of 5 Klebsiella pneumoniae samples, 
 including one reference sequence, to test the software. To download the raw data 
@@ -107,7 +105,7 @@ the web-app for visualization:
 ./amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
 ```
 
-#### Case study
+#### Case study example
 To analyze another dataset including 89 Klebsiella pneumoniae samples, 
 run the following commands to download the raw data:
 
