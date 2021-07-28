@@ -1,16 +1,16 @@
 
-# AMR-Viz
+# AMRViz
 
 
-## Welcome to AMR-Viz
+## Welcome to AMRViz
 
 **AMR-Viz** is a package for genomics analysis antimicrobial resistant bacteria. 
-The core of AMR-Viz is a pipeline that bundles the current best practice for 
-multiple aspects of AMR analyses. The pipeline analysis results are 
-represented and visualized via a web application. The web application also 
-provides efficient data management.
- 
-AMR-Viz is written in python, and its web back-end is implemented with nodejs. 
+The core of AMRViz is a pipeline that bundles the current best practice for 
+multiple aspects of genomics AMR analyses. The pipeline analysis results are 
+presented and visualized via a web application. AMRViz also provides a dashboard for 
+efficiently manage AMR genomic projects and data.
+
+AMRViz is written in python and its web back-end is implemented with nodejs. 
 It includes the followings dependencies:
  * blast (known to work with 2.10.1+)
  * samtools (1.11)
@@ -25,7 +25,19 @@ It includes the followings dependencies:
 
 ## Installation
 
-The simplest method is installed via conda:
+AMRViz offers multiple methods to install on a computer system. Users will need to
+check out the repository containing the setting neccessary for running AMRViz.
+
+```bash
+git clone --recursive https://github.com/amromics/amrviz
+cd amrviz
+```
+
+The instructions below assume working from the root directory for the repositorys.
+
+### Via conda
+
+AMRViz can be installed into a conda environment with the following steps:
 
 0. Download and install the appropriate conda, such as anaconda from 
    https://repo.anaconda.com/archive/
@@ -53,18 +65,17 @@ npm install -g live-server
 npm install
 npm run build --modern
 ```
-## Build docker images
-```bash
-docker build -f Dockerfile -t amrviz .
-```
+
+### Via docker
+
+We provide a docker container, namely `amrpmics/amrviz` for AMRViz application. 
+To use AMRViz docker, make sure that docker is installed on your system.
 
 ## Usage
 
-AMR-viz comprises two components: a web application and an analysis pipeline. 
+AMR-viz comprises two components: a web application and an analysis pipeline. To start
+the web server, run the following command from **amrviz** root directory 
 
-### To run the web application
-Change the current working directory to the **amrvis** cloned directory 
-in the step 4 of Intallation above.
 ```bash
 ./amrviz.py start [-p 3000] [--webapp-dir web-app]
 ```
@@ -72,41 +83,57 @@ in the step 4 of Intallation above.
 The web application is auto opened on the URL **localhost:3000** (or another 
 port if this port is occupied). 
 
-### To run the pipeline
+To run the pipeline, users need to provide a tsv file listing the samples and input
+data in either fastq (sequencing reads) or fasta (assemply). We provide the following
+examples:
 
-### Examples
+#### Miniature dataset example
 
-#### Miniature dataset
-
-
-We prepare a small dataset consisting 6 Klebsiella pneumoniae samples, including two reference sequences, test the softare. To download the raw data for the dataset:
+We prepare a small dataset consisting of 5 Klebsiella pneumoniae samples, 
+including one reference sequence, to test the software. To download the raw data 
+for the dataset:
 ```bash
-cd examples/Kp24/raw
-./download_Kp4.sh
+cd examples/Kp89/raw
+./download_mini.sh
 cd ../../
-
 ```
-With the following command, the system will perform genomics analysis, including pan-genome analysis of the six samples and import the results to the web-app for visualization:
+With the following command, the system will perform genomics analysis, 
+including pan-genome analysis of the five samples and import the results to 
+the web-app for visualization:
 
 ```bash
-./amr-analysis.py pg --time-log k24_time.log  -t 7 -m 25 -c KpClinicalGRBZ -i examples/Kp24/Kp24.tsv --work-dir data/work  -n "Collection of 24 clinical isolates from Greek and Brazil"
+./amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
 ```
 
-
-#### Case study
-To analyze another dataset including 24 Klebsiella pneumoniae samples, run the following commands to download the raw data:
+#### Case study example
+To analyze another dataset including 89 Klebsiella pneumoniae samples, 
+run the following commands to download the raw data:
 
 ```bash
-cd examples/Kp24/raw
+cd examples/Kp89/raw
 ./download.sh
 cd ../../
 ```
 
-The following command will run that 24 samples through the pipeline, and import the results
+The following command will run that 89 samples through the pipeline, and import the results
 to the web-app for visualization:
 
 ```bash
-./amrviz.py pa --time-log k24_time.log  -t 7 -m 25 -c KpClinicalGRBZ -i examples/Kp24/Kp24.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 24 clinical isolates from Greek and Brazil"
+./amrviz.py pa -t 8 -m 15 -c KpMDR89 -i examples/Kp89/config_Kp89.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 89 MDR clinical Kp in Kathmandu"
+```
+
+### Usage with docker
+For using docker, please replace the command `./amrviz.py` by 
+`docker run -v ``pwd``:/misc/amrviz --publish 3000:3000 amrviz amrviz.py`. For example
+
+To start the web-server
+```bash
+docker run -v `pwd`:/misc/amrviz --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amrviz/web-app
+```
+
+To run a pipeline:
+```bash
+docker run -v `pwd`:/misc/amrviz amrviz amrviz.py pa -t 8 -m 15 -c KpMDR89 -i examples/Kp89/config_Kp89.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 89 MDR clinical Kp in Kathmandu"
 ```
 
 
@@ -133,16 +160,3 @@ Please check the sample input file *data/samples/set1.tsv* for an example.
 
 
 -->
-## Usage with docker
-### Prepare folder structure
-AMRVIz need to mount 4 folders : downloaded database folder, examples folder (input folder), output folder, web-app working folder. For first time running, keep database,output and web-app data folders are empty. Organize input files and tsv files listing samples in examples folder (like examples folder in git repo). While using AMRVIZ, do not modify database folder and web-app folder. 
- 
-### To run the pipeline
-From the amrviz repository directory, run
-```bash
-docker run -it -v `pwd`:/misc/amrviz -w /misc/amrviz amrviz amrviz.py pa -t 7 -m 25 -c KpClinicalGRBZ4 -i /misc/amrviz/examples/Kp24/config_Kp4.tsv --work-dir /misc/amrviz/data/work --webapp-dir /misc/amrviz/web-app  -n "Collection of 4 clinical isolates from Greek and Brazil"
-```
-### To run the web application
-```bash
-docker run  -v `pwd`:/misc/amrviz --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amrviz/web-app
-```
