@@ -71,27 +71,21 @@ export class GeneFlowTree {
     this.links = [];
     this.allele_links = [];
     this.cell_size = 40;
+    this.selectedNodes=new Set();
+    this.svg=null;
+    this.hl_links=[];
   }
 
   load(genelabel, species_tree, gene_tree) {
 
     //console.log(alignment);
     this.control_gene.innerHTML = genelabel;
-
     this.species_tree = species_tree;
     this.gene_tree = gene_tree;
-
-
-
-
     var newick_raw = species_tree;
-
-
-
-
     var newick_species = NewickTools.parse(newick_raw);
     let nodes_species = d3.hierarchy(newick_species, d => d.branchset);
-    console.log(nodes_species);
+   // console.log(nodes_species);
     var stack = [];
     nodes_species.height = 0;
     stack.push(nodes_species);
@@ -101,6 +95,7 @@ export class GeneFlowTree {
     this.arr_sample_from_tree = [];
     this.nodes = [];
     this.links = [];
+    this.selectedNodes=new Set();
     this.allele_links=[];
     var max_heigth = 0;
     var max_depth = 0;
@@ -138,7 +133,7 @@ export class GeneFlowTree {
      //estimate length of sample name, by average length plus 10
      var newick_gene = NewickTools.parse(gene_tree);
      let nodes_gene = d3.hierarchy(newick_gene, d => d.branchset);
-     console.log(nodes_gene);
+     //console.log(nodes_gene);
      stack = [];
      var list_node_gene = [];
      nodes_gene.height = 0;
@@ -154,7 +149,7 @@ export class GeneFlowTree {
        count++;
        var newnode = { id: n.id, group: 0, type: 2, label: n.data.name, level: n.depth };
        if (n.children != undefined) {
- 
+       
         map_nodes_gene.set(n.id, []);
          for (var i = 0; i < n.children.length; i++) {
            stack.push(n.children[i]);
@@ -165,7 +160,7 @@ export class GeneFlowTree {
          if (n.depth > max_depth_gene) max_depth_gene = n.depth;
  
          newnode.group = 1;
- 
+         num_leaf_gene++;
  
        }
        list_node_gene.push(newnode);
@@ -178,7 +173,7 @@ export class GeneFlowTree {
      }
     //
     
-    var width_tree = (this.props.width - 20) / 2;
+    var width_tree = (this.props.width - 70) / 2;
     var distance_per_depth = width_tree / max_depth;
     var diff = width_tree + 20;
     var order = 1;
@@ -199,15 +194,15 @@ export class GeneFlowTree {
         this.nodes[i].fx = diff;
 
        
-        if(num_child>1){
-          
-          this.nodes[i].fy = (order * this.cell_size+ (order+num_child)* this.cell_size)/2;
-          order=order+num_child+1;
-        }        
-        else{
+       // if(num_child>1){
+      //    
+       //   this.nodes[i].fy = (order * this.cell_size+ (order+num_child)* this.cell_size)/2;
+      //    order=order+num_child+1;
+      //  }        
+      //  else{
           this.nodes[i].fy = order * this.cell_size;
           order = order+1;
-        }
+       // }
       }
     }
     var height = order * this.cell_size;
@@ -234,34 +229,25 @@ export class GeneFlowTree {
    
     //width_tree=width_tree-100;
     distance_per_depth =( width_tree-100) / max_depth_gene;
+    var step_y=(height-this.cell_size)/num_leaf_gene;
+   console.log(height+","+num_leaf_gene);
     var order = 1;
-    for (var j = 0; j < this.node_leaf.length; j++) {
-      var num_child = 0
-      for (var i = 0; i < list_node_gene.length; i++) {
+    for (var i = 0; i < list_node_gene.length; i++) {
+      for (var j = 0; j < this.node_leaf.length; j++) {
+     
+     
+    
+      
 
         var sample_name = list_node_gene[i].label.substring(0, list_node_gene[i].label.lastIndexOf("_"));
         //console.log(sample_name);
 
-        if (list_node_gene[i].group == 1 && this.node_leaf[j].label == sample_name) {
+        if (list_node_gene[i].group == 1 && this.node_leaf[j].label == sample_name ) {
           // console.log("found match");
-          num_child++;
-
-        }
-      }
-      var count_gene = 0;
-      var t = num_child / 2 + 0.5;
-      var step_y = this.cell_size ;
-      console.log(count_gene + "," + t + "," + step_y);
-      for (var i = 0; i < list_node_gene.length; i++) {
-
-        var sample_name = list_node_gene[i].label.substring(0, list_node_gene[i].label.lastIndexOf("_"));
-        //console.log(sample_name);
-
-        if (list_node_gene[i].group == 1 && this.node_leaf[j].label == sample_name && num_child > 0) {
-          // console.log("found match");
-          count_gene++;
+          //count_gene++;
           list_node_gene[i].fx = this.node_leaf[j].fx + 100;
-          list_node_gene[i].fy = this.node_leaf[j].fy + (count_gene - t) * step_y;
+          //list_node_gene[i].fy = this.node_leaf[j].fy + (count_gene - t) * step_y;
+          list_node_gene[i].fy=order* step_y;
           this.allele_links.push({ target: this.node_leaf[j].id, type: 2, source: list_node_gene[i].id, strength: 0.0 });
           order = order + 1;
         }
@@ -290,7 +276,7 @@ export class GeneFlowTree {
 
 
     Array.prototype.push.apply(this.nodes, list_node_gene)
-    console.log(this.nodes);
+    //console.log(this.nodes);
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
@@ -352,36 +338,36 @@ export class GeneFlowTree {
     var width = this.props.width,
       height = this.container.style.height;
     this.treeview.innerHTML = "";
-    var svg = d3.select("#amr_gf_treeview").append("svg")
+    this.svg = d3.select("#amr_gf_treeview").append("svg")
       .attr("width", width)
       .attr("height", height);
-    console.log(svg);
+    //console.log(svg);
     var linkForce = d3
       .forceLink()
       .id(function (link) { return link.id })
       .strength(function (link) { return link.strength })
 
-    var simulation = d3
+    this.simulation = d3
       .forceSimulation()
       .force('link', linkForce)
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(width / 2, height / 2))
-
+    var s=this.simulation;
     var dragDrop = d3.drag().on('start', function (node) {
       node.fx = node.x
       node.fy = node.y
     }).on('drag', function (node) {
-      simulation.alphaTarget(0.7).restart()
+     s.alphaTarget(0.7).restart()
       node.fx = d3.event.x
       node.fy = d3.event.y
     }).on('end', function (node) {
       if (!d3.event.active) {
-        simulation.alphaTarget(0)
+        s.alphaTarget(0)
       }
 
       node.fixed = true
     })
-    this.linkElements = svg.append("g")
+    this.linkElements = this.svg.append("g")
       .attr("class", "links")
       .selectAll("line")
       .data(this.links)
@@ -389,15 +375,24 @@ export class GeneFlowTree {
       .attr("stroke-width", this.getLinkStroke)
       .attr("stroke-linecap", "round")
       .attr("stroke", this.getLinkColor)
-    this.linkAlleleElements = svg.append("g")
+    this.linkAlleleElements = this.svg.append("g")
       .attr("class", "links")
       .selectAll("line")
       .data(this.allele_links)
       .enter().append("line")
-      .attr("stroke-width", 1)
+      .attr("stroke-width", 0)
       .attr("stroke-linecap", "round")
       .attr("stroke", "#66666666")
-    this.nodeElements = svg.append("g")
+    this.hightlight_overlay = this.svg.append("g")
+      .attr("class", "hl_link")
+      .selectAll("line")
+      .data(this.allele_links)
+      .enter().append("line")
+      .attr("stroke-width",0)
+      .attr("stroke-linecap", "round")
+      .attr("stroke", "#811112")
+      
+    this.nodeElements = this.svg.append("g")
       .attr("class", "nodes")
       .selectAll("circle")
       .data(this.nodes)
@@ -406,8 +401,10 @@ export class GeneFlowTree {
       .attr("fill", this.getNodeColor)
       .call(dragDrop)
       .on('click', this.selectNode.bind(this))
+      .on('mouseenter',this.highlightlink.bind(this))
+      .on('mouseleave',this.unhighlightlink.bind(this))
 
-    this.textElements = svg.append("g")
+    this.textElements = this.svg.append("g")
       .attr("class", "texts")
       .selectAll("text")
       .data(this.nodes)
@@ -417,7 +414,7 @@ export class GeneFlowTree {
       .attr("dx", 10)
       .attr("dy", function (node) { return node.type == 1 ? 2 : 10 })
 
-    simulation.nodes(this.nodes).on('tick', () => {
+      this.simulation.nodes(this.nodes).on('tick', () => {
       this.nodeElements
         .attr('cx', function (node) { return node.x })
         .attr('cy', function (node) { return node.y })
@@ -434,9 +431,15 @@ export class GeneFlowTree {
         .attr('y1', function (link) { return link.source.y })
         .attr('x2', function (link) { return link.target.x })
         .attr('y2', function (link) { return link.target.y })
+      this.hightlight_overlay
+        .attr('x1', function (link) { return link.source.x })
+        .attr('y1', function (link) { return link.source.y })
+        .attr('x2', function (link) { return link.target.x })
+        .attr('y2', function (link) { return link.target.y })
     });
-    simulation.force("link").links(this.links);
-    simulation.force("link").links(this.allele_links);
+    this.simulation.force("link").links(this.links);
+    this.simulation.force("link").links(this.allele_links);
+    
   }
   selectNode(selectedNode) {
     /*  
@@ -456,6 +459,51 @@ export class GeneFlowTree {
     this.linkElements.attr('stroke', function (link) { 
        return link.target.id === selectedNode.id || link.source.id === selectedNode.id ? 'green' : '#E5E5E5'
      }) */
+     this.addSelectedNode(selectedNode);
+    // consoleconsoleconsole.log(this.selectedNodes);
+     var nodes=this.selectedNodes;
+    
+     this.nodeElements.attr('fill', function (node) {  
+      if ( nodes.has(node.id)){
+       
+        if (node.type == 1)
+          return node.group === 1 ? 'blue' : '#233e8b'
+      } 
+      else{
+        if (node.type == 1)
+        return node.group === 1 ? '#233e8b' : '#233e8b'
+       if (node.type == 2)
+        return node.group === 1 ? '#CD113B' : '#CD113B'
+        if (node.type == 0)
+        return '#ffffff00'
+      }  
+      
+    });
+    this.linkAlleleElements.attr('stroke-width',function (link) { 
+      return (nodes.has(link.target.id)  || nodes.has(link.source.id))? '1' : '0'
+    });
+  }
+
+  addSelectedNode(selectedNode){
+    if(!this.selectedNodes.has(selectedNode.id))
+      this.selectedNodes.add(selectedNode.id);   
+    else{
+      this.selectedNodes.delete(selectedNode.id);
+    }  
+    
+  }
+ highlightlink(selectedNode){
+  this.hightlight_overlay.attr('stroke-width', function (link) {  
+    return link.target.id === selectedNode.id ? '1' : '0'  
+  })
+ }
+ 
+  unhighlightlink(selectedNode){
+    //this.svg.select(".hl_link").remove();
+    this.hightlight_overlay.attr('stroke-width', function (link) {  
+      return '0'  
+    })
+  
   }
   getNeighborNodes(node) {
 
@@ -477,9 +525,9 @@ export class GeneFlowTree {
 
 
   getNodeColor(node, neighbors) {
-    if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
-      return node.level === 1 ? '#5233e8b' : 'green'
-    }
+    //if (Array.isArray(neighbors) && neighbors.indexOf(node.id) > -1) {
+    //  return node.level === 1 ? '#233e8b' : 'green'
+    //}
     if (node.type == 1)
       return node.group === 1 ? '#233e8b' : '#233e8b'
     if (node.type == 2)
@@ -516,7 +564,7 @@ export class GeneFlowTree {
 
   }
   zoomOut() {
-    console.log("event zoom out");
+   // console.log("event zoom out");
     if (this.zoom_lv > 1) this.zoom_lv = this.zoom_lv - 1;
     this.draw();
 
