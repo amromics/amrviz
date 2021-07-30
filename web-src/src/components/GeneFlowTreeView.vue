@@ -73,6 +73,7 @@ export default {
         this.loading = true;
 
         //this.alignmentview.setActiveNames(arr_ids);
+        this.genflowtree.setActiveNames(arr_ids);
         this.loading = false;
       });
   },

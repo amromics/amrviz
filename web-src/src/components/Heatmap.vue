@@ -82,7 +82,7 @@ export default {
     //this.heatmapview.setOptions({width:900,height:400});
     this.heatmapview.draw();
     EventBus.$on('samples_emited', arr_ids => {
-      console.log('sample_emited '+arr_ids);
+     // console.log('sample_emited '+arr_ids);
       this.heatmapview.setActiveNames(arr_ids);
       
     });

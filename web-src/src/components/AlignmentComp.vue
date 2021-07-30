@@ -66,16 +66,16 @@ export default {
       //console.log(value);
       await this.loadAlignment(value);
    //this.loadAlignment();
-   EventBus.$on("gene_id_emited", gene_id => {
+      EventBus.$on("gene_id_emited", gene_id => {
         //console.log('gene_id_emited'+gene_id);
         this.loading = true;
-        console.log(this.loading);
+       // console.log(this.loading);
         this.reloadAlignment(gene_id);
 
         this.loading = false;
       });
       EventBus.$on("samples_emited", arr_ids => {
-        console.log('sample_emited '+arr_ids);
+       // console.log('sample_emited '+arr_ids);
         this.loading = true;
 
         this.alignmentview.setActiveNames(arr_ids);
