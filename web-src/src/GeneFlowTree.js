@@ -488,6 +488,7 @@ export class GeneFlowTree {
      }) */
      this.addSelectedNode(selectedNode);
     // consoleconsoleconsole.log(this.selectedNodes);
+    this.drawSelectNdoe();
      
   }
   drawSelectNdoe(){
