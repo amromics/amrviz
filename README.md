@@ -58,7 +58,7 @@ source activate amromics
 
 3. Install nodejs
 ```bash
-conda install -y -c conda-forge  nodejs==14.8.0
+mamba install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
 
