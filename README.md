@@ -44,8 +44,11 @@ AMRViz can be installed into a conda environment with the following steps:
    
 1. Create a conda environment with all the necessary dependencies: 
 ```bash
-conda create -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults --name amromics --file submodules/amromics/requirements.txt
+conda create -y -c conda-forge -c defaults --name amromics python=3.7 mamba
+source activate amromics
+mamba install -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults  --file submodules/amromics/requirements.txt
 ```
+
 2. Activate amromics environment and install amromics library and script
 ```bash
 source activate amromics
@@ -55,7 +58,7 @@ source activate amromics
 
 3. Install nodejs
 ```bash
-conda install -y -c conda-forge  nodejs==14.8.0
+mamba install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
 
