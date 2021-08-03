@@ -1,13 +1,18 @@
 <style scoped>
 </style>
 <template>
+<div>
+
 <div id="treeview">
+</div>
 </div>
 </template>
 <script>
 /* eslint-disable */
 import {Phylogeny} from "@/amromicsjs";
 import EventBus from '@/event-bus.js';
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 // import SampleIGV from "@/components/Visualization/IGV";
 export default {
     name: 'PhylogenyBrowser',
@@ -57,8 +62,18 @@ export default {
 
       
     },
-    method: {
-      
+    methods: {
+       saveImage: function(event){
+         console.log("download phylo");
+      html2canvas(document.getElementById("treeview")).then(function (canvas){
+          canvas.toBlob(function(blob) {
+        saveAs(blob, "Phylogeny.png"); 
+          document.body.appendChild(canvas);
+        }
+        );
+      }
+      );
+    }
     }
 };
 </script>

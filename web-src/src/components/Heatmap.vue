@@ -11,15 +11,18 @@ select{
   float:right;
   cursor: pointer;
 }
+
 </style>
 <template>
 <div>
+   <a id="btn_save" style="display:block;float:right;margin-top:-40px;"  v-on:click="saveImage"><i class="ti-download"></i></a>
 <div style="padding-bottom:10px;border-bottom:1px solid #aaa;">
   <select v-if="list_type"  name="type" id="type" v-model="selected_data" v-on:change="onChangeData">
     <option v-for="item  in list_type" :key="item.name" :value="item.type">{{item.name}}</option>
   </select>
   <a v-on:click="downloadCSV" id="download_link" class="download-link">Download CSV</a>
 </div>
+
 <div id="heatmap" style="width:100%">
 </div>
 </div>
@@ -163,9 +166,27 @@ export default {
         hiddenElement.target = '_blank';
         hiddenElement.download = this.selected_data+'.csv';
         hiddenElement.click();
-        console.log(rows);
-       
-        
+        //console.log(rows);       
+    },
+     saveImage: function(event){
+        var svg_tree=document.getElementById("ph_treeview").firstElementChild;
+        var svg_heatmap=document.getElementById("ph_heatmapview").firstElementChild;
+        var svg=document.createElement("svg");
+        svg.setAttribute("width",svg_tree.getAttribute("width")+svg_heatmap.getAttribute("width"));
+        svg.setAttribute("height",svg_heatmap.getAttribute("height"));
+        var g_tree=svg_tree.childNodes[0].cloneNode(true);
+        var g_treename=svg_tree.childNodes[1].cloneNode(true);
+        var g_heatmap=svg_heatmap.firstChild.cloneNode(true);
+        g_heatmap.setAttribute("transform","translate("+svg_tree.getAttribute("width")+",30)");
+        svg.appendChild(g_tree);
+        svg.appendChild(g_treename);
+        svg.appendChild(g_heatmap);
+        var container=document.createElement("div");
+        container.appendChild(svg);
+        var svg_str=container.innerHTML;
+        svg_str=svg_str.replace("<svg","<svg xmlns=\"http://www.w3.org/2000/svg\"");
+        var blob = new Blob([svg_str], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "Heatmap.svg");
     }
   }
 };

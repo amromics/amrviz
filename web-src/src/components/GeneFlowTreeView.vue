@@ -22,9 +22,11 @@
   left: 50%;
   top: 50%;
 }
+
 </style>
 <template>
   <div>
+   <a id="btn_save" style="float:right;margin-top:-40px;"  v-on:click="saveImage"><i class="ti-download"></i></a>
     <div id="gftreeview" style="width:100%"></div>
   </div>
 </template>
@@ -33,7 +35,7 @@
 import { GeneFlowTree } from "@/amromicsjs";
 import EventBus from "@/event-bus.js";
 import SampleAPI from "@/api/SampleAPI";
-
+import { saveAs } from 'file-saver';
 export default {
   name: "GeneFlowTreeView",
   props: ["species_tree","alignmentData"],
@@ -116,20 +118,23 @@ export default {
       this.loading = false;
     },
     async reloadAlignment(gene_id) {
+     // console.log( this.list_alignments);
       for (var i = 0; i < this.list_alignments.length; i++) {
-        if (this.list_alignments[i].gene == gene_id) {
+        
+        if (this.list_alignments[i].gene == gene_id.replace("-","")) {
+         
           var tree = atob(this.alignmentData.alignments[i].tree).replace(
             /.ref/g,
             ""
           );
           tree = tree.replace(/.fasta/g, "");
-          //console.log(tree);
-          const value = await SampleAPI.fetchAlignment(
-            this.collectionId,
-            gene_id
-          );
-          const pako = require('pako');
-          this.current_alignment=JSON.parse(pako.ungzip(value.data,{ to: 'string' }));
+          // console.log(this.list_alignments[i].gene);
+          // const value = await SampleAPI.fetchAlignment(
+          //   this.collectionId,
+          //   this.list_alignments[i].gene
+          // );
+          // const pako = require('pako');
+          // this.current_alignment=JSON.parse(pako.ungzip(value.data,{ to: 'string' }));
 
          this.genflowtree.load(
             this.alignmentData.alignments[i].gene,
@@ -141,7 +146,14 @@ export default {
           break;
         }
       }
+    },
+     saveImage: function(event){
+        var svg=document.getElementById("amr_gf_treeview").innerHTML;
+        svg=svg.replace("<svg","<svg xmlns=\"http://www.w3.org/2000/svg\"");
+        var blob = new Blob([svg], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "GeneTreeView.svg");
     }
+   
   }
 };
 </script>

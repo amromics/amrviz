@@ -27,9 +27,11 @@
   animation: spin 2s linear infinite;
   display: inline-block;
 }
+
 </style>
 <template>
   <div>
+    <a id="btn_save" style="float:right;margin-top:-40px;" v-on:click="saveImage"><i class="ti-download"></i></a>
     <div id="aligmentview" style="width:100%"></div> 
   </div>
 </template>
@@ -38,6 +40,8 @@
 import { AlignmentViewer } from "@/amromicsjs";
 import EventBus from "@/event-bus.js";
 import SampleAPI from "@/api/SampleAPI";
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 // import SampleIGV from "@/components/Visualization/IGV";
 export default {
   name: "AlignmentComp",
@@ -122,7 +126,7 @@ export default {
     },
     async reloadAlignment(gene_id) {
       for (var i = 0; i < this.list_alignments.length; i++) {
-        if (this.list_alignments[i].gene == gene_id) {
+        if (this.list_alignments[i].gene == gene_id.replace("-","")) {
           var tree = atob(this.alignmentData.alignments[i].tree).replace(
             /.ref/g,
             ""
@@ -131,7 +135,7 @@ export default {
           //console.log(tree);
           const value = await SampleAPI.fetchAlignment(
             this.collectionId,
-            gene_id
+            this.list_alignments[i].gene
           );
           const pako = require('pako');
           this.current_alignment=JSON.parse(pako.ungzip(value.data,{ to: 'string' }));
@@ -145,6 +149,26 @@ export default {
           break;
         }
       }
+    },
+    saveImage: function(event){
+        var svg_tree=document.getElementById("al_treeview").firstElementChild;
+        var svg_alignment=document.getElementById("al_alignment").firstElementChild;
+        var svg=document.createElement("svg");
+        svg.setAttribute("width",svg_tree.getAttribute("width")+svg_alignment.getAttribute("width"));
+        svg.setAttribute("height",svg_tree.getAttribute("height"));
+        var g_tree=svg_tree.childNodes[0].cloneNode(true);
+        var g_treename=svg_tree.childNodes[1].cloneNode(true);
+        var g_alignment=svg_alignment.firstChild.cloneNode(true);
+        g_alignment.setAttribute("transform","translate("+svg_tree.getAttribute("width")+",30)");
+        svg.appendChild(g_tree);
+        svg.appendChild(g_treename);
+        svg.appendChild(g_alignment);
+        var container=document.createElement("div");
+        container.appendChild(svg);
+        var svg_str=container.innerHTML;
+        svg_str=svg_str.replace("<svg","<svg xmlns=\"http://www.w3.org/2000/svg\"");
+        var blob = new Blob([svg_str], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "Alignment.svg");
     }
   }
 };
