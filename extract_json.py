@@ -216,6 +216,7 @@ def find_amr(amr_file):
     print(amr_file)
     set_amr = set()
     ret = {'hits': []}
+    
     with open(amr_file) as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
         #print(len(reader))
@@ -234,6 +235,7 @@ def find_amr(amr_file):
             amr['product'] = row['PRODUCT']
             amr['resistance'] = row['RESISTANCE']
             ret['hits'].append(amr)
+            
     str_gene = ''
 
     for v in set_amr:
@@ -343,27 +345,31 @@ def export_pangenome_cluster(pre_abs_file, exp_dir):
 
 
 def export_amr_heatmap(report, exp_dir):
-    set_genes = set()
-    set_class = set()
-    set_samples = set()
-    heatmap_stats = {'hits': []}
-    set_vir_gene = set()
+   
+    heatmap_stats = {'channels': []}
+    channel_by_db={}
+    channel_by_db['Virulome genes']=[]
+   
     for sample in report['samples']:
         ret = find_amr(sample['resistome'])
         for v in ret['hits']:
-            set_genes.add(v['gene'])
-            set_class.add(v['resistance'])
+            #set_genes.add(v['gene'])
+            #set_class.add(v['resistance'])
+            if not ('AMR genes-'+v['db']) in channel_by_db:
+                channel_by_db[('AMR genes-'+v['db'])]=[]
+            
             hit = {'sample': sample['id'],
                    'gene': v['gene'],
                    'type': 'amr',
                    'class': v['resistance'],
                    'identity': float(v['identity'].replace('%', '')),
                    'product': v['product']}
-            heatmap_stats['hits'].append(hit)
+            
+            channel_by_db[('AMR genes-'+v['db']) ].append(hit)
 
         ret = find_virulome(sample['virulome'])
         for v in ret['hits']:
-            set_vir_gene.add(v['gene'])
+            #set_vir_gene.add(v['gene'])
             # set_class.add(v['resistance'])
             hit = {'sample': sample['id'],
                    'gene': v['gene'],
@@ -371,10 +377,20 @@ def export_amr_heatmap(report, exp_dir):
                    'identity': float(v['identity'].replace('%', '')),
                    'product': v['product']}
             # hit['class']=v['class']
-            heatmap_stats['hits'].append(hit)
-    heatmap_stats['list_genes'] = list(set_genes.union(set_vir_gene))
-    heatmap_stats['list_class'] = list(set_class)
-    heatmap_stats['samples'] = list(set_samples)
+            channel_by_db['Virulome genes'].append(hit)
+        for m in sample['metadata'].keys():
+            if not m in channel_by_db.keys():
+                channel_by_db[m]=[]
+            hit = {'sample': sample['id'],
+                   'gene': sample['metadata'][m],
+                   'type': 'meta',
+                   'identity': 1,
+                   'product':m+"-"+sample['metadata'][m]}
+            channel_by_db[m].append(hit)
+    for key in channel_by_db.keys():
+        channel={'name':key,'hit':channel_by_db[key]}  
+        heatmap_stats['channels'].append(channel)
+         
     save_path = exp_dir + "/set/amrheatmap.json"
     json.dump(heatmap_stats, open(save_path, 'w'))
     return "/set/amrheatmap.json"

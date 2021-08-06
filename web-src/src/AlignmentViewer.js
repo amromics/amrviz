@@ -75,7 +75,7 @@ export class AlignmentViewer {
     control_option_radio_nucl.setAttribute("type", "radio");
     control_option_radio_nucl.setAttribute("name", "view");
     control_option_radio_nucl.setAttribute("value", "nucl");
-    control_option_radio_nucl.setAttribute("checked", "true");
+  
     control_option_radio_nucl.addEventListener("change", this.onChangeType.bind(this));
     var label_radio_button_nucl = document.createElement('label');
     label_radio_button_nucl.innerHTML = "Nucleotide";
@@ -86,6 +86,7 @@ export class AlignmentViewer {
     control_option_radio_prot.setAttribute("type", "radio")
     control_option_radio_prot.setAttribute("name", "view")
     control_option_radio_prot.setAttribute("value", "prot")
+    control_option_radio_prot.setAttribute("checked", "true");
     control_option_radio_prot.addEventListener("change", this.onChangeType.bind(this));
     var label_radio_button_prot = document.createElement('label');
     label_radio_button_prot.innerHTML = "Protein";
@@ -99,7 +100,7 @@ export class AlignmentViewer {
     this.container.appendChild(this.treeview);
     this.container.appendChild(this.alignmentview);
     this.zoom_lv = 3;
-    this.current_type="nucl";
+    this.current_type="prot";
     this.active_names=[];
     this.display_branch_length=true;
   }

@@ -9,25 +9,26 @@ export class PhyloHeatmap {
     this.props = {
       width: this.container.clientWidth,
       height: 400,
-      
+
     };
     var treeview = document.createElement("div");
     treeview.id = "ph_treeview";
     treeview.style.width = this.props.width / 5 + "px";
-    treeview.style.float="left";
+    treeview.style.float = "left";
     var heatmapview = document.createElement("div");
     heatmapview.id = "ph_heatmapview";
-    heatmapview.style.width = (this.props.width-this.props.width / 5) + "px";
-    heatmapview.style.float="left";
+    heatmapview.style.width = (this.props.width - this.props.width / 5) + "px";
+    heatmapview.style.float = "left";
     heatmapview.style.overflowX = "scroll";
-    heatmapview.style.position="relative";
+    heatmapview.style.position = "relative";
     this.container.appendChild(treeview);
     this.container.appendChild(heatmapview);
-    this.active_names=[];
-    this.cell_size=20;
+    this.active_names = [];
+    this.cell_size = 20;
   }
-  load(phylotree, hits) {
-    this.hits = hits;    
+  load(phylotree, channels) {
+    this.channels = channels;
+    console.log(this.channels);
     var margin = {
       top: 30,
       right: 30,
@@ -36,17 +37,17 @@ export class PhyloHeatmap {
     };
     //var width_tree =  this.props.width / 5 - margin.left - margin.right-50;
     var newick = NewickTools.parse(phylotree);
-     //estimate length of sample name, by average length plus 10
-     var numchar=0;
-     var listsamples=Object.keys(NewickTools.dfs(newick));
-    
-     for (var s in listsamples){
-       numchar=numchar+listsamples[s].length;
-      
-     }
-     var namelength=numchar/listsamples.length*5+10;
-     var width_tree = this.props.width / 5 - margin.left - margin.right-namelength;
-     //  assigns the data to a hierarchy using parent-child relationships
+    //estimate length of sample name, by average length plus 10
+    var numchar = 0;
+    var listsamples = Object.keys(NewickTools.dfs(newick));
+
+    for (var s in listsamples) {
+      numchar = numchar + listsamples[s].length;
+
+    }
+    var namelength = numchar / listsamples.length * 5 + 10;
+    var width_tree = this.props.width / 5 - margin.left - margin.right - namelength;
+    //  assigns the data to a hierarchy using parent-child relationships
     let nodes = d3.hierarchy(newick, d => d.branchset);
     // maps the node data to the tree layout
     let dist = 20;
@@ -80,8 +81,8 @@ export class PhyloHeatmap {
         num_leaf++;
       }
     }
-    var height=num_leaf*this.cell_size;
-    this.container.style.height= (height + 100) + "px";
+    var height = num_leaf * this.cell_size;
+    this.container.style.height = (height + 100) + "px";
     var distance_per_depth = width_tree / max_depth;
     stack = [];
     stack.push(nodes);
@@ -122,17 +123,27 @@ export class PhyloHeatmap {
         }
       }
     }
-    
+
     const treemap = d3.tree().size([height, width_tree]);
     this.fnodes = treemap(nodes);
     //collect item for x axist
-    this.genes = [];
-    for (var i = 0; i < this.hits.length; i++) {
+    this.total_gene = 0;
+    this.step = [];
+    for (var c = 0; c < this.channels.length; c++) {
+      var genes = [];
+      for (var i = 0; i < this.channels[c].hit.length; i++) {
 
-        if (!this.genes.includes(this.hits[i].gene)) {
-          this.genes.push(this.hits[i].gene);
+        if (!genes.includes(this.channels[c].hit[i].gene)) {
+          genes.push(this.channels[c].hit[i].gene);
         }
       }
+      this.total_gene += genes.length;
+
+      this.step.push(genes.length);
+
+    }
+
+
 
 
   }
@@ -141,8 +152,8 @@ export class PhyloHeatmap {
     this.props.height = options.height;
 
   }
-  drawTree(){
-    var active_names=this.active_names;
+  drawTree() {
+    var active_names = this.active_names;
     document.getElementById("ph_treeview").innerHTML = "";
     var margin = {
       top: 30,
@@ -150,24 +161,24 @@ export class PhyloHeatmap {
       bottom: 60,
       left: 30
     };
-    var width = this.props.width / 5 ;
+    var width = this.props.width / 5;
     //var height = 400 - margin.top - margin.bottom;
-    var height = this.node_leaf.length*this.cell_size;
-    var height_rect =this.cell_size;
+    var height = this.node_leaf.length * this.cell_size;
+    var height_rect = this.cell_size;
     var svg2 = d3
       .select("#ph_treeview")
       .append("svg")
-      .attr("width", width )
-      .attr("height", this.cell_size*this.node_leaf.length + margin.top + margin.bottom);
+      .attr("width", width)
+      .attr("height", this.cell_size * this.node_leaf.length + margin.top + margin.bottom);
     var g = svg2
       .append("g")
       .attr(
         "transform",
-        "translate(" + margin.left + "," + (margin.top + height_rect/2) + ")"
+        "translate(" + margin.left + "," + (margin.top + height_rect / 2) + ")"
       );
 
     // adds the links between the nodes
-    this.graphic_tree=g;
+    this.graphic_tree = g;
     const link = g
       .selectAll(".link")
       .data(this.fnodes.descendants().slice(1))
@@ -175,7 +186,7 @@ export class PhyloHeatmap {
       .append("path")
       .attr("class", "link")
       .style("stroke", "black")
-    .style("fill", "none")
+      .style("fill", "none")
 
       .attr("d", d => {
         return (
@@ -195,7 +206,7 @@ export class PhyloHeatmap {
       });
 
     // adds each node as a group
-    var active_names=this.active_names;
+    var active_names = this.active_names;
 
     //console.log(active_names);
     const node = g
@@ -205,7 +216,7 @@ export class PhyloHeatmap {
       .append("g")
       .attr(
         "class",
-        d => "node" + (d.children ? " node--internal" : " node--leaf") +(active_names.includes(d.data.name.replace(/\'/g,''))?" node--active":"")
+        d => "node" + (d.children ? " node--internal" : " node--leaf") + (active_names.includes(d.data.name.replace(/\'/g, '')) ? " node--active" : "")
       )
       .attr("transform", d => "translate(" + d.ay + "," + d.ax + ")");
 
@@ -236,15 +247,15 @@ export class PhyloHeatmap {
           "M" + d.ay + "," + d.ax + "L" + (width + margin.right) + "," + d.ax
         );
       });
-      var y_data=this.arr_sample_from_tree.slice();
-      y_data.reverse();
-      // Build X scales and axis:
-      var y = d3
-        .scaleBand()
-        .range([height, 0])
-        .domain(y_data)
-        .padding(0.01);
-      svg2
+    var y_data = this.arr_sample_from_tree.slice();
+    y_data.reverse();
+    // Build X scales and axis:
+    var y = d3
+      .scaleBand()
+      .range([height, 0])
+      .domain(y_data)
+      .padding(0.01);
+    svg2
       .append("g")
       .attr(
         "transform",
@@ -257,154 +268,236 @@ export class PhyloHeatmap {
       .call(d3.axisLeft(y));
   }
 
-  drawHeatmap(){
+  drawHeatmap() {
     var margin = {
       top: 30,
       right: 30,
       bottom: 100,
-      left:0
+      left: 0
     };
-    var height = this.node_leaf.length*this.cell_size;
-    var width = this.genes.length*this.cell_size ;
+    this.height = this.node_leaf.length * this.cell_size;
+    this.width = this.total_gene * this.cell_size;
     document.getElementById("ph_heatmapview").innerHTML = "";
-    var svg = d3
+    this.svg = d3
       .select("#ph_heatmapview")
       .append("svg")
-      .attr("width", width )
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("width", this.width)
+      .attr("height", this.height + margin.top + margin.bottom)
       .append("g")
-      .attr("transform", "translate(" + (margin.left ) + "," + margin.top + ")");
+      .attr("transform", "translate(" + (margin.left) + "," + margin.top + ")");
+    var count_gene = 0;
+    for (var c = 0; c < this.channels.length; c++) {
+
+      this.drawChannel(this.channels[c], count_gene, c);
+      count_gene += this.step[c];
+
+    }
+  }
+  drawChannel(channel, count_gene, order) {
+    var hits = channel.hit;
+    var genes = [];
+    for (var i = 0; i < hits.length; i++) {
+
+      if (!genes.includes(hits[i].gene)) {
+        genes.push(hits[i].gene);
+      }
+    }
     var x = d3
       .scaleBand()
-      .range([0, this.genes.length*this.cell_size])
-      .domain(this.genes)
+      .range([count_gene * this.cell_size, count_gene * this.cell_size + genes.length * this.cell_size])
+      .domain(genes)
       .padding(0.01);
-    var selected_samples=this.active_names;  
-    var highlight_genes=new Set();
-    for (var i=0;i<this.hits.length;i++){
+    var selected_samples = this.active_names;
+    var highlight_genes = new Set();
+    for (var i = 0; i < hits.length; i++) {
       //console.log(this.hits[i].sample);
-      if (selected_samples.includes(this.hits[i].sample)){
-        highlight_genes.add(this.hits[i].gene);
+      if (selected_samples.includes(hits[i].sample)) {
+        highlight_genes.add(hits[i].gene);
       }
     }
     //console.log(highlight_genes);
-    var tick_x=svg
+    var tick_x = this.svg
       .append("g")
-      .attr("transform", "translate(" + 0 + "," + height + ") ")
+      .attr("transform", "translate(" + 0 + "," + this.height + ") ")
       .call(d3.axisBottom(x))
       .selectAll("text")
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".25em")
       .attr("transform", "rotate(-65)")
-      .style("font-weight", function(d) {
+      .style("font-weight", function (d) {
         //console.log(d);
-        if(highlight_genes.has(d)){
-         
+        if (highlight_genes.has(d)) {
+
           return "bold";
         }
-        else{
+        else {
           //console.log("no bold"+d);
           return "normal";
         }
-        
+
       })
-      .style("fill", function(d) {
+      .style("fill", function (d) {
         //console.log(d);
-        if(highlight_genes.has(d)){
-         
+        if (highlight_genes.has(d)) {
+
           return "blue";
         }
-        else{
+        else {
           //console.log("no bold"+d);
           return "black";
         }
       })
-     ;
-    var selected_samples=this.active_names;
-    var y_data=this.arr_sample_from_tree.slice();
+      ;
+    var selected_samples = this.active_names;
+    var y_data = this.arr_sample_from_tree.slice();
     y_data.reverse();
     // Build X scales and axis:
     var y = d3
       .scaleBand()
-      .range([height, 0])
+      .range([this.height, 0])
       .domain(y_data)
       .padding(0.01);
     // svg.append("g").call(d3.axisLeft(y));
-     // create a tooltip
-     var tooltip = d3
-     .select("#ph_heatmapview")
-     .append("div")
-     .style("opacity", 0)
-     .attr("class", "tooltip")
-     .style("position","absolute")
-     .style("background-color", "white")
-     .style("border", "solid")
-     .style("border-width", "2px")
-     .style("border-radius", "5px")
-     .style("padding", "5px");
+    // create a tooltip
+    var tooltip = d3
+      .select("#ph_heatmapview")
+      .append("div")
+      .style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "2px")
+      .style("border-radius", "5px")
+      .style("padding", "5px");
 
-   // Three function that change the tooltip when user hover / move / leave a cell
-   var mouseover = function(d) {
-     tooltip.style("opacity", 1);
+    // Three function that change the tooltip when user hover / move / leave a cell
+    var mouseover = function (d) {
+      tooltip.style("opacity", 1);
 
-     d3.select(this)
-       .style("stroke", "black")
-       .style("opacity", 1);
+      d3.select(this)
+        .style("stroke", "black")
+        .style("opacity", 1);
 
-   };
-   var mousemove = function(d) {
-     tooltip
-       .html(
-         d.gene +
-         " in " +
-         d.sample +
-         "<br>" +
-         "Identity: " +
-         d.identity +
-         "<br>" + (d.type == "amr" ? d.class : d.product)
+    };
+    var mousemove = function (d) {
+      tooltip
+        .html(
+          d.gene +
+          " in " +
+          d.sample +
+          "<br>" +
+          "Identity: " +
+          d.identity +
+          "<br>" + (d.type == "amr" ? d.class : d.product)
 
-       )
-       .style("left", d3.mouse(this)[0] + 70 + "px")
-       .style("top", d3.mouse(this)[1] + "px");
-   };
-   var mouseleave = function(d) {
-     tooltip.style("opacity", 0);
-     d3.select(this).style("stroke", "white");
-   };
-    svg
+        )
+        .style("left", d3.mouse(this)[0] + 70 + "px")
+        .style("top", d3.mouse(this)[1] + "px");
+    };
+    var mouseleave = function (d) {
+      tooltip.style("opacity", 0);
+      d3.select(this).style("stroke", "white");
+    };
+    this.svg.append('rect')
+        .attr('x', count_gene * this.cell_size)
+        .attr('y',-20)
+        .attr('width', genes.length * this.cell_size)
+        .attr('height', 20)
+        .attr('stroke', 'white')
+        .attr('fill', function () {
+          var o=order;
+          if (o > 4) o = 5 - o;
+          if (order == 0)
+            return  "#a30000";
+          else if (o == 1) {
+            return "#004777";
+          }
+          else if (o == 2) {
+            return "#FF7700";
+          }
+          else if (o == 3) {
+            return "#4E4C67";
+          }
+          else if (o == 4) {
+            return "#157F1F";
+          }
+        });
+      this.svg.append('text')
+        .attr("x", count_gene * this.cell_size+genes.length * this.cell_size/2)
+        .attr("y",-10)
+        .attr("dy", ".35em")
+        .attr("fill", "white")
+        .text(channel.name);
+    this.svg
       .selectAll()
-      .data(this.hits, function(d) {
-       
-          return d.sample + ":" + d.gene;
+      .data(hits, function (d) {
+
+        return d.sample + ":" + d.gene;
       })
       .enter()
       .append("rect")
-      .attr("x", function(d) {
+      .attr("x", function (d) {
         return x(d.gene);
       })
-      .attr("y", function(d) {
+      .attr("y", function (d) {
         return y(d.sample);
       })
       .attr("width", x.bandwidth())
       .attr("height", y.bandwidth())
 
-      .style("fill", function(d) {
-            //return amrColor(d.class);
-          if(selected_samples.includes(d.sample) )
-            return "#6E1214";
-          else
-          return "#DD2429";
+      .style("fill", function (d) {
+        var isHighlight = false;
+        if (selected_samples.includes(d.sample)) {
+          isHighlight = true;
         }
+        if (order > 4) order = 5 - order;
+        if (order == 0)
+          return isHighlight ? "#700000" : "#a30000";
+        else if (order == 1) {
+          return isHighlight ? "#002944" : "#004777";
+        }
+        else if (order == 2) {
+          return isHighlight ? "#cc5f00" : "#FF7700";
+        }
+        else if (order == 3) {
+          return isHighlight ? "#38364a" : "#4E4C67";
+        }
+        else if (order == 4) {
+          return isHighlight ? "#0e5314" : "#157F1F";
+        }
+      }
 
       )
-     .style("stroke", "white")
-     .on("mouseover", mouseover)
-     .on("mousemove", mousemove)
-     .on("mouseleave", mouseleave);
+      .style("stroke", "white")
+      .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseleave", mouseleave);
   }
-  setActiveNames(names){
-    this.active_names=names;
+  getColorFill(d, order) {
+    var isHighlight = false;
+    if (this.active_names.includes(d.sample)) {
+      isHighlight = true;
+    }
+    if (order > 4) order = 5 - order;
+    if (order == 0)
+      return isHighlight ? "#700000" : "#a30000";
+    else if (order == 1) {
+      return isHighlight ? "#002944" : "#004777";
+    }
+    else if (order == 2) {
+      return isHighlight ? "#cc5f00" : "#FF7700";
+    }
+    else if (order == 3) {
+      return isHighlight ? "#38364a" : "#4E4C67";
+    }
+    else if (order == 4) {
+      return isHighlight ? "#0e5314" : "#157F1F";
+    }
+  }
+  setActiveNames(names) {
+    this.active_names = names;
     this.draw();
   }
   //Draw heatmap
