@@ -81,11 +81,12 @@ export class ContigCircos {
     this._contig = [];
     for (var i = 0; i < this.contigs.length; i++) {
       var contig_id = this.contigs[i].name.split(' ')[0];
+      var t_contig=contig_id.split('_');
       if (set_highlight_contigs.has(contig_id))
         this._contig.push({
           len: this.contigs[i].length,
           color: "#bc80bd",
-          label: contig_id.split('_')[1],
+          label: t_contig[t_contig.length-1],
           id: contig_id
         });
     }
@@ -134,7 +135,7 @@ export class ContigCircos {
         }
       },
       tooltipContent: function(datum, index) {
-        console.log(datum);
+       // console.log(datum);
         return `<h5>${datum.label}</h5>`
       },
       events: {

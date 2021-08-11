@@ -28,7 +28,7 @@ export class PhyloHeatmap {
   }
   load(phylotree, channels) {
     this.channels = channels;
-    console.log(this.channels);
+   // console.log(this.channels);
     var margin = {
       top: 30,
       right: 30,

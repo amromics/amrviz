@@ -193,7 +193,7 @@ export default {
       var map_sample = new Map();
       var map_gene = new Map();
       var map = new Map();
-      console.log(data_to_export);
+      //console.log(data_to_export);
       for (var i = 0; i < data_to_export.length; i++) {
         if (!map_sample.has(data_to_export[i].sample)) {
           map_sample.set(data_to_export[i].sample, map_sample.size);

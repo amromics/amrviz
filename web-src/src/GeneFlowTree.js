@@ -513,7 +513,7 @@ export class GeneFlowTree {
     this.linkAlleleElements.attr('stroke-width',function (link) { 
       return (nodes.has(link.target.id)  || nodes.has(link.source.id))? '1' : '0'
     });
-    console.log('')
+    //console.log('')
     this.getConnectionLink();
   }
   addSelectedNode(selectedNode){
@@ -615,7 +615,7 @@ export class GeneFlowTree {
     var set_active_link=this.getActiveLink(this.selectedNodes);
      //find all gene node:
      var active_gene=new Set();
-     console.log(this.allele_links);
+    // console.log(this.allele_links);
      for(var allele of this.allele_links ){
        if(this.selectedNodes.has(allele.target.id)){
         active_gene.add(allele.source.id);
@@ -624,7 +624,7 @@ export class GeneFlowTree {
 
   
     var set_active_gene_link=this.getActiveLink(active_gene);
-    console.log(set_active_gene_link);
+    //console.log(set_active_gene_link);
     for (let elem of set_active_gene_link) {
       set_active_link.add(elem);
     }

@@ -4,6 +4,7 @@
 work/
 web-app/static/data
 examples/*/*/*gz
+web-src/public/static
 
 
 

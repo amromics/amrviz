@@ -31,7 +31,7 @@ export default {
       var pie = new PanPieChart(ctx);
       const value = await SampleAPI.fetchPangenomeSummary(this.collectionId);
       this.core_data=value.data;
-      console.log(this.core_data.group);
+      //console.log(this.core_data.group);
      
       pie.load(this.core_data.group);
       

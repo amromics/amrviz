@@ -364,7 +364,7 @@ export default {
         window.open("/sample/"+collectionId+"/" + data[0], "_blank");
       });
       var childtemplate = function(d) {
-        console.log(d);
+        //console.log(d);
 
        var html =
 
@@ -409,7 +409,7 @@ export default {
       });
       $("#cluster_table tbody").on("click", "tr", function() {
         var data = table_clusters.row($(this)).data();
-        console.log("gene_id_emited"+data[0])
+       // console.log("gene_id_emited"+data[0])
         
         EventBus.$emit("gene_id_emited", data[0]);
         if ($(this).hasClass("selected")) {
@@ -423,7 +423,7 @@ export default {
       $('#cluster_table tbody')
         .on( 'mouseenter', 'td', function () {
             var rowIdx = table_clusters.cell(this).index().column;
-            console.log(rowIdx);
+            //(rowIdx);
             $( table_clusters.cells().nodes() ).removeClass( 'highlight' );
             $( table_clusters.row( rowIdx ).nodes() ).addClass( 'highlight' );
         } );

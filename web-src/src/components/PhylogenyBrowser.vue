@@ -51,9 +51,13 @@ export default {
           for (var i=0;i<nodeIds.length;i++){
             arr_ids.push(nodeIds[i].replace(/\'/g,''));
           }
-          console.log(arr_ids);
+          //console.log(arr_ids);
           EventBus.$emit('samples_emited',arr_ids);
         }
+      });
+      ctx.addEventListener("meta_select", function(event) {
+       // console.log(event.detail);
+        EventBus.$emit('samples_emited', event.detail);
       });
       this.loading = false;
       
@@ -64,7 +68,7 @@ export default {
     },
     methods: {
        saveImage: function(event){
-         console.log("download phylo");
+         //console.log("download phylo");
       html2canvas(document.getElementById("treeview")).then(function (canvas){
           canvas.toBlob(function(blob) {
         saveAs(blob, "Phylogeny.png"); 

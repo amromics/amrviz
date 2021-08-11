@@ -141,7 +141,7 @@ export class Phylogeny {
     this.tree.setTextSize(20);
     this.tree.lineWidth = 1;
     this.tree.setTreeType(this.type);
-    console.log(this.newick_tree);
+    //console.log(this.newick_tree);
     ///////this.tree.showBranchLengthLabels =true;
     this.tree.showBootstrap = true;
     this.tree.showInternalNodeLabels = this.tree.showBootstrap;
@@ -202,7 +202,7 @@ export class Phylogeny {
       box.addEventListener("click",this.hightlightLeaves.bind(this,event,metadata_name,value));
       ///////////////box.addEventListener("onmouseleave",this.unhightlightLeaves.bind(this,event,box.getAttribute("data-meta")));
       box.addEventListener("mouseover", function(){
-        console.log("mouseover");
+        //console.log("mouseover");
         this.style.border="2px solid #000000 ";
       }, false);
       box.addEventListener("mouseout", function(){
@@ -225,13 +225,14 @@ export class Phylogeny {
   hightlightLeaves(event,metadata_name,value){
    // var metavalue=event.target.getAttribute("data-meta");
    var metavalue=value;
-    console.log("hightligh:"+metavalue);
+    //console.log("hightligh:"+metavalue);
+    var arr_hightlightnode=[];
     for(var i=0;i<this.tree.leaves.length;i++){
       var nodeid=this.tree.leaves[i].id.replace(/\'/g,'');
       //console.log(this.metadata[nodeid][metadata_name]);
       //console.log(this.tree.leaves[i].data);
       if (metavalue==this.tree.leaves[i].data.meta){
-        console.log(this.tree.leaves[i].data.meta);
+        //console.log(this.tree.leaves[i].data.meta);
         this.tree.leaves[i].setDisplay({
           colour:  this.metadata_style[metadata_name][this.metadata[nodeid][metadata_name]],
           shape: 'circle', // or square, triangle, star
@@ -248,6 +249,7 @@ export class Phylogeny {
             format: 'bold',
           },
         });
+        arr_hightlightnode.push(nodeid);
       }
      
       else
@@ -268,6 +270,10 @@ export class Phylogeny {
         },
       });
     }
+    console.log(arr_hightlightnode);
+    this.container.dispatchEvent(new CustomEvent("meta_select", {
+      detail: arr_hightlightnode
+    }));    
   }
  
 }

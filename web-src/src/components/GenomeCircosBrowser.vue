@@ -30,11 +30,11 @@ export default {
       circos.setOptions({width:500,height:500});
       circos.draw();
       ctx.addEventListener("contig_select", function(event) {
-        console.log(event.detail);
+        //console.log(event.detail);
         EventBus.$emit('contig_emited', event.detail);
       });
       ctx.addEventListener("element_select", function(event) {
-        console.log(event.detail);
+        //console.log(event.detail);
         EventBus.$emit('element_emited', event.detail);
       });
       this.loading = false;

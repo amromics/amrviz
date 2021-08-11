@@ -670,7 +670,7 @@ export class AlignmentViewer {
 
   }
   zoomOut() {
-    console.log("event zoom out");
+   // console.log("event zoom out");
     if (this.zoom_lv > 1) this.zoom_lv = this.zoom_lv - 1;
     this.draw();
 
