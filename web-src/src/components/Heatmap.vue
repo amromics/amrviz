@@ -33,7 +33,7 @@ select {
 <template>
   <div>
     <a id="btn_save" style="display:block;float:right;margin-top:-40px;" v-on:click="saveImage">
-      <i class="ti-download"></i>
+      <i class="ti-camera"></i>
     </a>
     <div style="padding-bottom:10px;min-height:35px;border-bottom:1px solid #aaa;">
       <select
@@ -95,6 +95,7 @@ export default {
     const value = await SampleAPI.fetchHeatmap(this.collectionId);
     this.heatmap = value.data;
     this.list_type = [];
+    console.log(this.heatmap);
     for (var channel of this.heatmap.channels) {
       this.list_type.push({ type: channel.name, name: channel.name });
     }

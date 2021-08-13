@@ -2,7 +2,9 @@
 </style>
 <template>
 <div>
-
+  <a id="btn_download_tree" style="display:block;float:right;margin-top:-40px;" v-on:click="saveTree">
+      <i class="ti-download"></i>
+    </a>
 <div id="treeview">
 </div>
 </div>
@@ -11,7 +13,7 @@
 /* eslint-disable */
 import {Phylogeny} from "@/amromicsjs";
 import EventBus from '@/event-bus.js';
-import html2canvas from 'html2canvas';
+
 import { saveAs } from 'file-saver';
 // import SampleIGV from "@/components/Visualization/IGV";
 export default {
@@ -67,17 +69,10 @@ export default {
       
     },
     methods: {
-       saveImage: function(event){
-         //console.log("download phylo");
-      html2canvas(document.getElementById("treeview")).then(function (canvas){
-          canvas.toBlob(function(blob) {
-        saveAs(blob, "Phylogeny.png"); 
-          document.body.appendChild(canvas);
-        }
-        );
+       saveTree: function(event){
+          var blob = new Blob([this.newitck_tree], { type: "text/plain;charset=utf-8" });
+          saveAs(blob, "Phylogeny.tree");
       }
-      );
-    }
     }
 };
 </script>

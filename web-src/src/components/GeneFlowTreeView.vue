@@ -26,7 +26,7 @@
 </style>
 <template>
   <div>
-   <a id="btn_save" style="float:right;margin-top:-40px;"  v-on:click="saveImage"><i class="ti-download"></i></a>
+   <a id="btn_save" style="float:right;margin-top:-40px;"  v-on:click="saveImage"><i class="ti-camera"></i></a>
     <div id="gftreeview" style="width:100%"></div>
   </div>
 </template>
