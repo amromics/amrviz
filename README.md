@@ -98,7 +98,7 @@ for the dataset:
 ```bash
 cd examples/Kp89/raw
 ./download_mini.sh
-cd ../../
+cd ../../..
 ```
 With the following command, the system will perform genomics analysis, 
 including pan-genome analysis of the five samples and import the results to 
