@@ -426,16 +426,18 @@ def export_msa(report, exp_dir):
 
 def export_alignment(gene, aln_dir, exp_dir):
     aligments = []
-    nu_aln = os.path.join(aln_dir, gene + '.fna.aln')
+    nu_aln = os.path.join(aln_dir, gene + '.fna.aln.gz')
     nucl_dict = {}
-    for record in SeqIO.parse(nu_aln, "fasta"):
-        seq = str(record.seq).upper()
-        nucl_dict[record.id] = seq
-    pro_aln = os.path.join(aln_dir, gene + '.faa.aln')
-    for record in SeqIO.parse(pro_aln, "fasta"):
-        seq = str(record.seq).upper()
-        sample = {'sample': record.id, 'seq': nucl_dict[record.id], 'protein': seq}
-        aligments.append(sample)
+    with gzip.open(nu_aln, 'rt') as fh:
+        for record in SeqIO.parse(fh, "fasta"):
+            seq = str(record.seq).upper()
+            nucl_dict[record.id] = seq
+    pro_aln = os.path.join(aln_dir, gene + '.faa.aln.gz')
+    with gzip.open(pro_aln, 'rt') as fh:
+        for record in SeqIO.parse(fh, "fasta"):
+            seq = str(record.seq).upper()
+            sample = {'sample': record.id, 'seq': nucl_dict[record.id], 'protein': seq}
+            aligments.append(sample)
     if not os.path.exists(exp_dir + "/set/alignments/"):
         os.makedirs(exp_dir + "/set/alignments/")
     save_path = exp_dir + "/set/alignments/" + gene + ".json.gz"
