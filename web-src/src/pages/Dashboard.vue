@@ -165,7 +165,7 @@ export default {
       this.list_collection = value.data.collections;
        for (var i=0;i<this.list_collection.length;i++){
         const samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
-        console.log(samples_value);
+       // console.log(samples_value);
         for(var j=0;j<samples_value.data.samples.length;j++){
             var obj=samples_value.data.samples[j];
             obj['collectionID']=this.list_collection[i].collectionID;
@@ -214,7 +214,7 @@ export default {
         var date=new Date(this.list_collection[i].dateModify);
         this.activityChart.data.series[0][date.getMonth()]=this.activityChart.data.series[0][date.getMonth()]+1;
       }
-    console.log(this.activityChart);
+   // console.log(this.activityChart);
     }
   }
 };

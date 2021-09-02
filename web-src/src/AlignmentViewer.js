@@ -312,6 +312,7 @@ export class AlignmentViewer {
   setActiveNames(names){
     //this.active_names=names;
     //refine activename
+    this.active_names=[];
     for (var i =0;i<names.length;i++){
       for(var j=0;j<this.arr_sample_from_tree.length;j++){
         if(this.arr_sample_from_tree[j].includes(names[i].replace(/\'/g,'')))

@@ -136,7 +136,7 @@ export class GeneFlowTree {
     //estimate length of sample name, by average length plus 10
     var newick_gene = NewickTools.parse(gene_tree);
     let nodes_gene = d3.hierarchy(newick_gene, d => d.branchset);
-    console.log(nodes_gene);
+   // console.log(nodes_gene);
     nodes_gene=this.simpleSortBaseonStrainOrder( this.node_leaf,nodes_gene);
     stack = [];
     var list_node_gene = [];
@@ -314,7 +314,7 @@ export class GeneFlowTree {
                 let t=n.children[i];
                 n.children[i]=n.children[j];
                 n.children[j]=t;
-                console.log("swap:"+sample_name_i+":"+true_order.get(sample_name_i)+","+sample_name_j+":"+true_order.get(sample_name_j));
+                //console.log("swap:"+sample_name_i+":"+true_order.get(sample_name_i)+","+sample_name_j+":"+true_order.get(sample_name_j));
                 
               }
             }
