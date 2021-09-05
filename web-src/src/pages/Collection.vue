@@ -238,7 +238,7 @@ export default {
       // console.log(this.sampleId)
       this.isReady = false;
       const value = await SampleAPI.fetchSetResult(this.collectionId);
-      console.log(value)
+     // console.log(value)
       var result = value.data.results;
       this.list_sample = value.data.samples;
 

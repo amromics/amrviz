@@ -95,7 +95,7 @@ export default {
     const value = await SampleAPI.fetchHeatmap(this.collectionId);
     this.heatmap = value.data;
     this.list_type = [];
-    console.log(this.heatmap);
+    //console.log(this.heatmap);
     for (var channel of this.heatmap.channels) {
       this.list_type.push({ type: channel.name, name: channel.name });
     }

@@ -225,8 +225,8 @@ export class AlignmentViewer {
           n.children[i].height = n.height + n.children[i].data.length;
         }
       } else {
-        if (n.height > max_heigth) max_heigth = n.height;
-        if (n.height < min_height_not_zero && n.height>0) min_height_not_zero = n.height;
+       // if (n.height > max_heigth) max_heigth = n.height;
+       // if (n.height < min_height_not_zero && n.height>0) min_height_not_zero = n.height;
         if (n.depth > max_depth) max_depth = n.depth;
         this.node_leaf.push(n);
         this.arr_sample_from_tree.push(
@@ -234,6 +234,8 @@ export class AlignmentViewer {
         );
         num_leaf++;
       }
+      if (n.height > max_heigth) max_heigth = n.height;
+      if (n.height < min_height_not_zero && n.height>0) min_height_not_zero = n.height;
     }
     //console.log("arr from tree");
     //console.log(arr_sample_from_tree);
@@ -296,14 +298,24 @@ export class AlignmentViewer {
 
   }
   logscale(min_value,max_value,max_scale,v){
-    if (v==0) return 0;
+    //console.log(min_value+","+max_value+","+max_scale+","+v);
+    if(max_value/min_value>10){
+      if (v==0) return 0;
     //change range to make sure all value greater 1
     let mul=Math.pow(10,-Math.log10(min_value));
     max_value=mul*max_value;
     v=mul*v;
     let k=max_scale/Math.log10(max_value);
+    //console.log( k*Math.log10(v));
     return k*Math.log10(v);
+    }
+    else{
+      //use normal scale
+      return v*max_scale/max_value;
+    }
+    
   }
+ 
   setOptions(options) {
     this.props.width = options.width;
     this.props.height = options.height;
@@ -367,6 +379,7 @@ export class AlignmentViewer {
 
     // adds the links between the nodes
     this.graphic_tree=g;
+   //console.log(this.fnodes);
     const link = g
       .selectAll(".link")
       .data(this.fnodes.descendants().slice(1))
@@ -404,7 +417,13 @@ export class AlignmentViewer {
           d => "node" + (d.children ? " node--internal" : " node--leaf") +(active_names.includes(d.data.name.replace(/\'/g,''))?" node--active":"")
       )
       .attr("transform", d => "translate(" + d.ay + "," + d.ax + ")");
-
+      const textElements = g.selectAll(".node--internal")
+      .data(this.fnodes.descendants()) 
+      .enter().append("text")
+      .text(function (node) { return node.children? node.data.name:"" })
+      .attr("font-size",10)
+      .attr("dx", function (node) { return node.ay-17; })
+      .attr("dy",function (node) { return node.ax-3 } )   
     // adds the circle to the node
 
     const leftnode = g

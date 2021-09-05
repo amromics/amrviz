@@ -110,6 +110,7 @@ export default {
         ""
       );
       tree_data = tree_data.replace(/.fasta/g, "");
+      //console.log(tree_data);
       //console.log(this.alignmentData.alignments[0])
       this.alignmentview.load(
         this.alignmentData.alignments[0].gene,
@@ -133,6 +134,7 @@ export default {
           );
           tree = tree.replace(/.fasta/g, "");
           //console.log(tree);
+          // console.log(tree);
           const value = await SampleAPI.fetchAlignment(
             this.collectionId,
             this.list_alignments[i].gene
