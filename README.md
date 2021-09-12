@@ -6,7 +6,7 @@
 
 **AMR-Viz** is a package for genomics analysis of antimicrobial resistant (AMR) bacteria. 
 The core of AMRViz is a pipeline that bundles the current best practices for 
-multiple aspects of AMR genomics analyses. The pipeline analysis results are 
+end-to-end AMR genomics analyses. The pipeline analysis results are 
 presented and visualized via a web application. AMRViz also provides a dashboard for 
 efficient management of AMR genomic projects and data.
 
@@ -23,31 +23,38 @@ It includes the followings dependencies:
  * roary (3.13.0)
  * iqtree (2.1.2)
 
-AMRViz can be installed and used locally via *conda* or *docker*. In the next section, we outline
-the details on the installation and usage via *conda*. Installation and usage via *docker* is very much the
-same with some modifications outlined in the section after the next one.
 
-## Via conda
+## Getting started
 
-### Installation
+AMRViz is cross-platform and can be installed via *conda* or *docker*.
+
+
+
+### Installation with conda
+
+AMRViz can be installed on a Unix-like machine running conda. It can also run on Windows
+machines via WSL. Follow the instructions [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10) 
+to set up WSL on Windows. Make sure that a conda container such as 
+[anaconda](https://www.anaconda.com/) or 
+[miniconda](https://docs.conda.io/en/latest/miniconda.html)
+is installed. 
+
+Instructions:
 
 1. Check out the github AMRViz repository.
-
 ```bash
 git clone --recursive https://github.com/amromics/amrviz
 ```
 
-2. Change to the root directory for the repository
+2. Change to the root directory for the repository and extract database
 
 ```bash
 cd amrviz
+tar zxvf db.tar.gz
 ```
 The instructions below assume working from the root directory for the repository.
-
-3. Download and install the appropriate conda, such as anaconda from 
-   https://repo.anaconda.com/archive/
    
-4. Create a conda environment named `amromics` with all the necessary dependencies: 
+3. Create a conda environment named `amromics` with all the necessary dependencies: 
 
 ```bash
 conda create -y -c conda-forge -c defaults --name amromics python=3.7 mamba
@@ -55,7 +62,7 @@ source activate amromics
 mamba install -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults  --file submodules/amromics/requirements.txt
 ```
 
-5. Activate `amromics` environment and install amromics library and script
+4. Activate `amromics` environment and install amromics library and script
 
 ```bash
 source activate amromics
@@ -63,56 +70,91 @@ source activate amromics
 
 ```
 
-6. Install *nodejs*
+5. Install *nodejs*
 
 ```bash
 mamba install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
 
-7. (Optional) Setup and build web application using *npm*
+6. (Optional) Setup and build web application using *npm*
 
 ```bash
 npm install
 npm run build --modern
 ```
 
+### Installation with docker
+We provide a docker container, namely amromics/amrviz for AMRViz application. 
+To use AMRViz docker, make sure that docker is installed on your system. Installation
+for docker requires only the first two steps as above.
+
 ### Usage
+
+#### Prepare a miniature dataset
+
+To illustrate AMRViz usage, we prepare a small dataset consisting of 5 Klebsiella pneumoniae 
+samples, including one reference sequence, to test the software. To download the raw data 
+for the dataset:
+
+```bash
+# with conda installation 
+cd examples/Kp89/raw
+./download_mini.sh
+cd ../../..
+```
+
+
+```bash
+# with docker installation 
+docker run -v `pwd`:/misc/amrviz amromics/amrviz /bin/bash -c 'cd examples/Kp89/raw/;bash download_mini.sh'
+```
+
+#### Start web-server
 
 AMR-viz comprises two components: a web application and an analysis pipeline. To start
 the web server, run the following command from **amrviz** root directory
 
 ```bash
-./amrviz.py start [-p 3000] [--webapp-dir web-app]
+# with conda installation
+./amrviz.py start -p 3000 --webapp-dir web-app/
 ```
-
-The web application is auto opened on the URL **localhost:3000** (or another 
-port if this port is occupied). 
-
-To run the pipeline, users need to provide a *tsv* file listing the samples and input
-data in either *fastq* (sequencing reads) or *fasta* (assemply). We provide the following
-examples:
-
-#### Miniature dataset example
-
-We prepare a small dataset consisting of 5 Klebsiella pneumoniae samples, 
-including one reference sequence, to test the software. To download the raw data 
-for the dataset:
 
 ```bash
-cd examples/Kp89/raw
-./download_mini.sh
-cd ../../..
+# with docker installation
+docker run -v `pwd`:/misc/amrviz -w /misc/amrviz  --publish 3000:3000  amromics/amrviz amrviz.py start --webapp-dir web-app/ --port 3000
 ```
+
+The web application is auto opened on the URL **localhost:3000** (or another port if this port is occupied). 
+
+#### Analyze the miniature dataset
+
+To run the pipeline, users need to provide a *tsv* file listing the samples and input
+data in either *fastq* (sequencing reads) or *fasta* (assemply). The input file for the 
+miniature dataset is under ` examples/Kp89/config_mini.tsv`
+
+
 With the following command, the system will perform genomics analysis, 
 including pan-genome analysis of the five samples and import the results to 
 the web-app for visualization:
 
 ```bash
+# with conda instalation
 ./amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
 ```
 
-#### Case study example
+```bash
+# with docker instalation
+docker run  -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates 2"
+```
+
+#### Known issues
+
+- For MacOS and Windows/WSL, one of the steps of the assembly process (`kmc`) 
+  crashes with the the conda installation. If your collection includes samples needed
+  assemby (ie in fastq input data), please use docker installation
+
+### Case study example
 To analyze another dataset including 89 Klebsiella pneumoniae samples, 
 run the following commands to download the raw data:
 
@@ -129,30 +171,7 @@ to the web-app for visualization:
 ./amrviz.py pa -t 8 -m 15 -c KpMDR89 -i examples/Kp89/config_Kp89.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 89 MDR clinical Kp in Kathmandu"
 ```
 
-## Via docker
 
-### Installation
-
-We provide a docker container, namely `amrpmics/amrviz` for AMRViz application. 
-To use AMRViz docker, make sure that docker is installed on your system.
-
-For docker, installation only requires checking out the github AMRViz repository and changing to the root 
-directory for the repository following step 1 and 2 in installation via conda.
-
-### Usage
-
-Usage with docker is the same as usage with conda except that for docker, please replace the command `./amrviz.py` for conda with 
-`docker run -v ``pwd``:/misc/amrviz --publish 3000:3000 amrviz amrviz.py`. For example
-
-To start the web-server
-```bash
-docker run -v `pwd`:/misc/amrviz --publish 3000:3000 amrviz amrviz.py start --webapp-dir /misc/amrviz/web-app
-```
-
-To run a pipeline:
-```bash
-docker run -v `pwd`:/misc/amrviz amrviz amrviz.py pa -t 8 -m 15 -c KpMDR89 -i examples/Kp89/config_Kp89.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 89 MDR clinical Kp in Kathmandu"
-```
 
 
 <!--
