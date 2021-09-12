@@ -13,7 +13,7 @@ COPY submodules/amromics/amromics /misc/amromics/amrviz/submodules/amromics/amro
 COPY submodules/amromics/requirements.txt /misc/amromics/amrviz/submodules/amromics/
 COPY submodules/amromics/setup.py /misc/amromics/amrviz/submodules/amromics/
 COPY submodules/amromics/amr-analysis.py /misc/amromics/amrviz/submodules/amromics/
-COPY web-app /misc/amromics/amrviz/web-app
+#COPY web-app /misc/amromics/amrviz/web-app
 COPY amrviz.py /misc/amromics/amrviz
 COPY extract_json.py /misc/amromics/amrviz
 

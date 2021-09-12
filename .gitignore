@@ -5,7 +5,7 @@ work/
 web-app/static/data
 examples/*/*/*gz
 web-src/public/static
-
+web-app/static/data/collections.json
 
 
 

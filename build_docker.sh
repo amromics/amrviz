@@ -4,7 +4,7 @@
 # $ ./build_docker.sh 0.1.1
 
 DOCKER_NAME=amrviz
-current="0.1.1"
+current="1.0.0"
 
 
 if [ $# -eq 0 ]; then
@@ -20,4 +20,7 @@ docker build -f Dockerfile -t ${DOCKER_NAME} .
 
 #tag
 docker tag $DOCKER_NAME:latest amromics/$DOCKER_NAME:$version
+#docker tag $DOCKER_NAME:latest amromics/$DOCKER_NAME:latest
+
+#docker push amromics/amrviz:$version
 
