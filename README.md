@@ -107,7 +107,7 @@ cd ../../..
 
 ```bash
 # with docker installation 
-docker run -v `pwd`:/misc/amrviz amromics/amrviz /bin/bash -c 'cd examples/Kp89/raw/;bash download_mini.sh'
+docker run -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz /bin/bash -c 'cd examples/Kp89/raw/;bash download_mini.sh'
 ```
 
 #### Start web-server
