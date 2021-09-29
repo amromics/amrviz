@@ -152,7 +152,7 @@ docker run  -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz amrviz.py pa -
 
 - For MacOS and Windows/WSL, one of the steps of the assembly process (`kmc`) 
   crashes with the the conda installation. If your collection includes samples needed
-  assemby (ie in fastq input data), please set the estimated genome size to bypass running kmc
+  assemby (ie in fastq input data), please set the estimated genome size (`gsize`) to bypass running kmc. See `examples/Kp89/config_mini.tsv` for example.
 
 ### Case study example
 To analyze another dataset including 89 Klebsiella pneumoniae samples, 
