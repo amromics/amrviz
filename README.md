@@ -57,7 +57,7 @@ The instructions below assume working from the root directory for the repository
 3. Create a conda environment named `amromics` with all the necessary dependencies: 
 
 ```bash
-conda create -y -c conda-forge -c defaults --name amromics python=3.7 mamba
+conda create -y -c conda-forge -c defaults --name amromics python=3.7 mamba=0.13.0
 source activate amromics
 mamba install -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults  --file submodules/amromics/requirements.txt
 ```
