@@ -14,3 +14,13 @@ for ac in ERR349747 ERR349756 ERR349757 ERR349758 ERR349759 ERR349763 ERR349764 
     fi
 done
 
+
+# long reads
+for ac in SRR10176979 SRR1185120;do
+    if [ ! -f ${ac}.fastq.gz ];then
+        echo " Downloading Accession ${ac} ..."
+        fasterq-dump --progress  ${ac} && gzip ${ac}.fastq
+    else
+        echo " Accession ${ac} has been downloaded!"
+    fi
+done

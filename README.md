@@ -140,12 +140,12 @@ the web-app for visualization:
 
 ```bash
 # with conda instalation
-./amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
+./amrviz.py pa  --time-log Kp7_log.time -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 6 MDR clinical Kp isolates"
 ```
 
 ```bash
 # with docker instalation
-docker run  -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates 2"
+docker run  -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
 ```
 
 #### Known issues
