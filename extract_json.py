@@ -82,10 +82,10 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
         os.makedirs(exp_dir_current + "/set")
     set_result.append({'group': 'phylo_heatmap', 'data': export_amr_heatmap(report, exp_dir_current)})
     set_result.append({'group': 'pan_sum',
-                       'data': export_pangenome_summary(report['roary'] + '/summary_statistics.txt',
+                       'data': export_pangenome_summary(report['pan'] + '/summary_statistics.txt',
                                                         exp_dir_current)})
     set_result.append({'group': 'pan_cluster',
-                       'data': export_pangenome_cluster(report['roary'] + '/gene_presence_absence.csv.gz',
+                       'data': export_pangenome_cluster(report['pan'] + '/gene_presence_absence.csv',
                                                         exp_dir_current)})
     set_result.append(
         {'group': 'phylogeny_tree', 'data': export_phylogeny_tree(report['phylogeny'] + '/core_gene_alignment.treefile')})
@@ -106,7 +106,7 @@ def export_assembly(contigs_file_contents):
     seq_dict = {}
     skew_list = []
     content_list = []
-    with gzip.open(contigs_file_contents, 'rt') as fn:
+    with open(contigs_file_contents, 'rt') as fn:
         for seq in SeqIO.parse(fn, "fasta"):
             current_contig = ''
             nodename = seq.id
@@ -216,7 +216,7 @@ def find_amr(amr_file):
     print(amr_file)
     set_amr = set()
     ret = {'hits': []}
-    
+
     with open(amr_file) as tsvfile:
         reader = csv.DictReader(tsvfile, dialect='excel-tab')
         #print(len(reader))
@@ -235,7 +235,7 @@ def find_amr(amr_file):
             amr['product'] = row['PRODUCT']
             amr['resistance'] = row['RESISTANCE']
             ret['hits'].append(amr)
-            
+
     str_gene = ''
 
     for v in set_amr:
@@ -264,7 +264,7 @@ def export_known_genes(annotation_gff):
         return ''
     knowgene = {'genes': []}
     #f = open(gff_file)
-    with gzip.open(annotation_gff, 'rt') as f:
+    with open(annotation_gff, 'rt') as f:
         line = f.readline()
         while line:
             if not line.startswith('##'):
@@ -328,7 +328,7 @@ def export_pangenome_cluster(pre_abs_file, exp_dir):
     #gene_df = pd.read_csv(gene_cluster_file, dtype=str, compression='gzip')
     #gene_df.fillna('', inplace=True)
     # pd.
-    with gzip.open(pre_abs_file, 'rt') as tsvfile:
+    with open(pre_abs_file, 'rt') as tsvfile:
         reader = csv.DictReader(tsvfile, delimiter=',', dialect='excel-tab')
         for row in reader:
             gene = {'gene': row['Gene'],
@@ -345,11 +345,11 @@ def export_pangenome_cluster(pre_abs_file, exp_dir):
 
 
 def export_amr_heatmap(report, exp_dir):
-   
+
     heatmap_stats = {'channels': []}
     channel_by_db={}
     channel_by_db['Virulome genes']=[]
-   
+
     for sample in report['samples']:
         ret = find_amr(sample['resistome'])
         for v in ret['hits']:
@@ -357,14 +357,14 @@ def export_amr_heatmap(report, exp_dir):
             #set_class.add(v['resistance'])
             if not ('AMR genes-'+v['db']) in channel_by_db:
                 channel_by_db[('AMR genes-'+v['db'])]=[]
-            
+
             hit = {'sample': sample['id'],
                    'gene': v['gene'],
                    'type': 'amr',
                    'class': v['resistance'],
                    'identity': float(v['identity'].replace('%', '')),
                    'product': v['product']}
-            
+
             channel_by_db[('AMR genes-'+v['db']) ].append(hit)
 
         ret = find_virulome(sample['virulome'])
@@ -388,9 +388,9 @@ def export_amr_heatmap(report, exp_dir):
                    'product':m+"-"+sample['metadata'][m]}
             channel_by_db[m].append(hit)
     for key in channel_by_db.keys():
-        channel={'name':key,'hit':channel_by_db[key]}  
+        channel={'name':key,'hit':channel_by_db[key]}
         heatmap_stats['channels'].append(channel)
-         
+
     save_path = exp_dir + "/set/amrheatmap.json"
     json.dump(heatmap_stats, open(save_path, 'w'))
     return "/set/amrheatmap.json"
@@ -426,14 +426,14 @@ def export_msa(report, exp_dir):
 
 def export_alignment(gene, aln_dir, exp_dir):
     aligments = []
-    nu_aln = os.path.join(aln_dir, gene + '.fna.aln.gz')
+    nu_aln = os.path.join(aln_dir, gene + '.fna.aln')
     nucl_dict = {}
-    with gzip.open(nu_aln, 'rt') as fh:
+    with open(nu_aln, 'rt') as fh:
         for record in SeqIO.parse(fh, "fasta"):
             seq = str(record.seq).upper()
             nucl_dict[record.id] = seq
-    pro_aln = os.path.join(aln_dir, gene + '.faa.aln.gz')
-    with gzip.open(pro_aln, 'rt') as fh:
+    pro_aln = os.path.join(aln_dir, gene + '.faa.aln')
+    with open(pro_aln, 'rt') as fh:
         for record in SeqIO.parse(fh, "fasta"):
             seq = str(record.seq).upper()
             sample = {'sample': record.id, 'seq': nucl_dict[record.id], 'protein': seq}
