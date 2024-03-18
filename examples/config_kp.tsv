@@ -101,4 +101,4 @@ ONT_8			Klebsiella	pneumoniae	nano-raw	examples/raw/ERR10367364.fastq.gz	No	NA
 ONT_9			Klebsiella	pneumoniae	nano-raw	examples/raw/ERR10367367.fastq.gz	No	NA
 ONT_10			Klebsiella	pneumoniae	nano-raw	examples/raw/ERR10367375.fastq.gz	No	NA
 ONT_11			Klebsiella	pneumoniae	nano-raw	examples/raw/ERR10367383.fastq.gz	No	NA
-Kpn2146	Sample Kpn2146	Kpn2146	Klebsiella	pneumoniae	pacbio-raw	examples/raw/SRR1185120.fastq.gz	No		
+Kpn2146	Sample Kpn2146	Kpn2146	Klebsiella	pneumoniae	pacbio-raw	examples/raw/SRR1185120.fastq.gz	No	NA
