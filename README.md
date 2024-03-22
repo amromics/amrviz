@@ -57,16 +57,22 @@ The instructions below assume working from the root directory for the repository
 3. Create a conda environment named `amromics` with all the necessary dependencies: 
 
 ```bash
-conda create -y -c conda-forge -c defaults --name amromics python=3.7 mamba=0.13.0
+conda create -y -c conda-forge -c defaults --name amromics python=3.10 mamba
 source activate amromics
+
+#Install dependencies
 mamba install -y -c conda-forge -c bioconda -c anaconda -c etetoolkit -c defaults  --file submodules/amromics/requirements.txt
+pip install panta
+
+#Install amromics
+(cd submodules/amromics && pip install .) 
+
 ```
 
-4. Activate `amromics` environment and install amromics library and script
-
+4. Extract databases
+   
 ```bash
-source activate amromics
-(cd submodules/amromics && pip install . --use-feature=in-tree-build) 
+tar zxvf submodules/amromics/db.tar.gz
 
 ```
 
