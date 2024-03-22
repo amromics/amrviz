@@ -86,8 +86,18 @@ export default {
       this.list_collection = value.data.collections;
 
       for (var i=0;i<this.list_collection.length;i++){
-        const samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
-        //console.log(samples_value);
+        var samples_value;
+        try{
+          samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
+        }
+        catch(error){
+          console.log(error);
+        }
+         
+        console.log(samples_value);
+        if (samples_value==undefined) continue;
+        if (samples_value.data==undefined) continue;
+        if (samples_value.data.samples==undefined) continue;
         for(var j=0;j<samples_value.data.samples.length;j++){
             var obj=samples_value.data.samples[j];
             obj['collectionID']=this.list_collection[i].collectionID;

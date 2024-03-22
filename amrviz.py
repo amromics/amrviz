@@ -67,10 +67,10 @@ def collection_extract_func(args):
 
     # Making sure the analysis for the
     cmd = f'amr-analysis.py pg -t {args.threads} -m {args.memory} -i {args.input} -c {collection_id}'
-    cmd += f' --work-dir {work_dir} -n "{collection_name}"'
+    cmd += f' --work-dir {work_dir} -n "{collection_name}" --genetree'
     if args.time_log is not None:
         cmd += f' --time-log {args.time_log}'
-
+    print(cmd)
     ret = os.system(cmd)
     if ret != 0:
         logger.error('Error running the pipeline')
@@ -114,4 +114,3 @@ def main(arguments=sys.argv[1:]):
 
 if __name__ == "__main__":
     main()
-

@@ -347,7 +347,9 @@ export default {
               for (var i =0;i<row[6].length;i++){
                 var link=row[6][i].file;
                 link=link.replace("web-app/","");//correct path file
-                html+='<a href=\''+link+'\'>'+row[6][i].name+'</a>&nbsp;'
+                
+                //console.log(link);
+                html+='<a href=../'+link+'>'+row[6][i].name+'</a>&nbsp;'
               }
                 
              return html;
