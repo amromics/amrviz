@@ -41,20 +41,15 @@ is installed.
 
 Instructions:
 
-1. Check out the github AMRViz repository.
+1. Check out the github AMRViz repository and change directory to the root of the repository
 ```bash
 git clone --recursive https://github.com/amromics/amrviz
-```
-
-2. Change to the root directory for the repository and extract database
-
-```bash
 cd amrviz
-tar zxvf db.tar.gz
 ```
+
 The instructions below assume working from the root directory for the repository.
    
-3. Create a conda environment named `amromics` with all the necessary dependencies: 
+2. Create a conda environment named `amromics` with all the necessary dependencies: 
 
 ```bash
 conda create -y -c conda-forge -c defaults --name amromics python=3.10 mamba
@@ -69,21 +64,21 @@ pip install panta
 
 ```
 
-4. Extract databases
+3 Extract databases
    
 ```bash
 tar zxvf submodules/amromics/db.tar.gz
 
 ```
 
-5. Install *nodejs*
+4. Install *nodejs*
 
 ```bash
 mamba install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
 
-6. (Optional) Setup and build web application using *npm*
+5 (Optional) Setup and build web application using *npm*
 
 ```bash
 npm install
@@ -165,16 +160,16 @@ To analyze another dataset including 89 Klebsiella pneumoniae samples,
 run the following commands to download the raw data:
 
 ```bash
-cd examples/Kp89/raw
-./download.sh
+cd examples/iGAS70/raw
+./download_ascp.sh
 cd ../../
 ```
 
-The following command will run those 89 samples through the pipeline, and import the results
+The following command will run those 76 samples through the pipeline, and import the results
 to the web-app for visualization:
 
 ```bash
-./amrviz.py pa -t 8 -m 15 -c KpMDR89 -i examples/Kp89/config_Kp89.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of 89 MDR clinical Kp in Kathmandu"
+./amrviz.py pa -t 8 -m 15 -c iGAS70 -i examples/iGAS70/config.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of >70 Steptococcus pyogenes from MDU-Australia."
 ```
 
 
