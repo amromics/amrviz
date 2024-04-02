@@ -160,11 +160,19 @@ export default {
       // console.log(this.sampleId)
       this.isReady = false;
       const value = await SampleAPI.fetchListCollectionResult();
-      //console.log(result)
+     
       //var result = value.data.results;
       this.list_collection = value.data.collections;
+      //console.log(this.list_collection);
        for (var i=0;i<this.list_collection.length;i++){
-        const samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
+        const samples_value = undefined;
+        try{
+          samples_value = await SampleAPI.fetchSetResult(this.list_collection[i].collectionID);
+        }
+        catch(error){
+          console.log(error);
+          continue;
+        }
        // console.log(samples_value);
         for(var j=0;j<samples_value.data.samples.length;j++){
             var obj=samples_value.data.samples[j];
@@ -181,7 +189,9 @@ export default {
       this.isReady = true;
     },
     loadData() {
+      console.log("load data");
       this.statsCollection['value']=this.list_collection.length;
+      console.log(this.statsCollection['value']);
       if(this.list_collection.length>0)
         this.statsCollection['footerText']="last update "+this.list_collection[0].dateModify;
       else{

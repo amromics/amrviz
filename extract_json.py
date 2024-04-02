@@ -267,7 +267,7 @@ def export_known_genes(annotation_gff):
     with open(annotation_gff, 'rt') as f:
         line = f.readline()
         while line:
-            if not line.startswith('##'):
+            if not line.startswith('#'):
                 token = line.split('\t')
                 if token[1] == 'prokka':
                     # start new gene record
@@ -290,6 +290,26 @@ def export_known_genes(annotation_gff):
                     for s in tok_des2:
                         if s.startswith('product='):
                             product = s.split('=')[1].strip().replace('\'', '')
+                    hit = {'contig': contig, 'start': start, 'end': end, 'strain': strain, 'name': name, 'type': gene_type,'product': product}
+                    knowgene['genes'].append(hit)
+                else:
+                    #not prokka format, assume PGAP format
+                    contig = token[0]
+                    start = int(token[3])
+                    end = int(token[4])
+                    strain = token[6]
+                    tok_des = token[8].split(';')
+                    name = ''
+                    product=''
+                    for s in tok_des:
+                        if s.startswith('gene='):
+                            name = s.split('=')[1]
+                            # collect type and product
+                  
+                   
+                        if s.startswith('product='):
+                            product = s.split('=')[1].strip().replace('\'', '')
+                    gene_type = token[2]
                     hit = {'contig': contig, 'start': start, 'end': end, 'strain': strain, 'name': name, 'type': gene_type,'product': product}
                     knowgene['genes'].append(hit)
             if line.startswith('##FASTA'):
