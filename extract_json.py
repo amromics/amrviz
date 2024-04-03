@@ -139,7 +139,10 @@ def export_assembly(contigs_file_contents):
                 GC = (C - G) / (G + C + 0.0)
 
             list_GCskew.append(round(GC, 3))
-            list_GCcontent.append(round((G + C) / (G + C + A + T), 3))
+            if (G + C + A + T)>0:
+                list_GCcontent.append(round((G + C) / (G + C + A + T), 3))
+            else:
+                list_GCcontent.append(0)
         skew_list.append({'contig': c, 'GC': list_GCskew})
         content_list.append({'contig': c, 'GC': list_GCcontent})
 
@@ -421,6 +424,9 @@ def export_phylogeny_tree(treefile):
     for node in t.get_descendants():
         if node.name == '' and node.dist < 0.00001:
             node.delete()
+        tok=node.name.split('-')
+        if len(tok)>1:
+            node.name=tok[len(tok)-1]
     data = t.write()
     message_bytes = data.encode('ascii')
     base64_bytes = base64.b64encode(message_bytes)
@@ -456,7 +462,12 @@ def export_alignment(gene, aln_dir, exp_dir):
     with open(pro_aln, 'rt') as fh:
         for record in SeqIO.parse(fh, "fasta"):
             seq = str(record.seq).upper()
-            sample = {'sample': record.id, 'seq': nucl_dict[record.id], 'protein': seq}
+            tok=record.id.split('-')
+            if len(tok)>1:
+                geneid=tok[len(tok)-1]
+            else:
+                geneid=record.id
+            sample = {'sample': geneid, 'seq': nucl_dict[record.id], 'protein': seq}
             aligments.append(sample)
     if not os.path.exists(exp_dir + "/set/alignments/"):
         os.makedirs(exp_dir + "/set/alignments/")
