@@ -17,7 +17,13 @@ logger = logging.getLogger(__name__)
 def copy_file_to_web(orginal_file, web_dir):
     try:
         web_file = os.path.join(web_dir, os.path.basename(orginal_file))
-        shutil.copyfile(orginal_file, web_file)
+        if not orginal_file.endswith('.zip') and not orginal_file.endswith('.gz'):
+            web_file=web_file+".gz"
+            with open(orginal_file, 'rb') as f_in:
+                with gzip.open(web_file, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+        else:
+            shutil.copyfile(orginal_file, web_file)
         return web_file
     except:
         logger.error('copy file '+orginal_file+' error')
