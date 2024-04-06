@@ -79,7 +79,15 @@ def collection_extract_func(args):
     extract_json.export_json(work_dir, webapp_data_dir, collection_id, collection_name)
     logger.info('Congratulations, collection {} is imported to web-app!'.format(collection_id))
 
+def export_result(args):
+    webapp_dir = args.webapp_dir
+    webapp_static_dir = os.path.join(webapp_dir, 'static')
 
+    if not os.path.exists(webapp_static_dir):
+        raise Exception('Webapp directory {} not available'.format(webapp_dir))
+    webapp_data_dir = os.path.join(webapp_static_dir, 'data')
+    extract_json.export_json(args.work_dir, webapp_data_dir, args.collection_id, args.collection_name)
+    logger.info('Exported! Collection {} is imported to web-app!'.format(args.collection_id))
 def main(arguments=sys.argv[1:]):
     parser = argparse.ArgumentParser(
         prog='amrviz',
@@ -107,6 +115,16 @@ def main(arguments=sys.argv[1:]):
     start_cmd.set_defaults(func=start_server_func)
     start_cmd.add_argument('-p', '--port', help='The port the server is running on', default=3000, type=int)
     start_cmd.add_argument('--webapp-dir', help='Webapp directory', default='web-app')
+
+    re_export_cmd = subparsers.add_parser(
+        'export', description='Export result to wwb app', help='Export to app',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    re_export_cmd.set_defaults(func=export_result )
+    re_export_cmd.add_argument('-c', '--collection-id', help='Collection ID', required=True, type=str)
+    re_export_cmd.add_argument('-n', '--collection-name', help='Collection name', type=str, default='')
+    
+    re_export_cmd.add_argument('--work-dir', help='Working directory', default='data/work')
+    re_export_cmd.add_argument('--webapp-dir', help='Webapp directory', default='web-app')
 
     args = parser.parse_args(arguments)
     return args.func(args)
