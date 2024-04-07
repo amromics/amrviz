@@ -180,6 +180,32 @@ select{
 </table>
   </card>
 </div>
+<div v-if="loaded" class="col-12">
+  <card :title="statsCards.vcf">
+<table id ='vcf_table' class="display" v-if="vcfData">
+  <thead>
+    <tr>
+      <th>Gene cluster</th>
+      <th>Reference Sequence</th>
+      <th>Position</th>
+      <th>REF</th>
+      <th>ALT</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="item in vcfDNAList" :key="item.id">
+      <td>{{item.gene}}</td>
+     
+      <td>{{item.chrom}}</td>
+      <td>{{item.pos}}</td>
+      <td>{{item.ref}}</td>
+      <td>{{item.alt}}</td>
+      
+    </tr>
+  </tbody>
+</table>
+  </card>
+</div>
 <div id="pn_browser" v-if="loaded" style="height: 650px;"  class="col-12">
    <card :title="statsCards.browser">
 
@@ -230,7 +256,8 @@ export default {
           mlst: "MLST",
           browser: "Genome browser",
           amr: "Antimicrobial resistance genes",
-          virulome: "Virulome"
+          virulome: "Virulome",
+          vcf:"VCFs"
        
         },
       activeNames: ['1'],
@@ -245,11 +272,14 @@ export default {
       resistomeData: undefined,
       virulomeData: undefined,
       assemblyData: undefined,
+      vcfData:undefined,
       pointData: undefined,
       skewData: undefined,
       contentData: undefined,
       annotationData: undefined,
       sample_info:undefined,
+      vcfDNAList:[],
+      vcProtList:[],
       loaded:false
 
     };
@@ -329,6 +359,18 @@ export default {
          
         ]
       });  
+      var vcf_table=$('#vcf_table').DataTable({
+         dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+      });
+        var vir_table=$('#virulome_table').DataTable({
+         dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel', 'pdf'
+        ]
+      });
       var amr_table =$('#amr_table').DataTable({
         dom: 'Bfrtip',
         buttons: [
@@ -387,12 +429,7 @@ export default {
 
 
 
-      var vir_table=$('#virulome_table').DataTable({
-         dom: 'Bfrtip',
-        buttons: [
-            'csv', 'excel', 'pdf'
-        ]
-      });
+    
        $("#virulome_table tbody").on("click", "td.start", function() {
          var data = vir_table.row($(this)).data();
        // window.open("/sample/" + data[0]);
@@ -425,6 +462,7 @@ export default {
 
       } );
        
+       
     },
     async fetchData(){
       const ret = await SampleAPI.fetchResult(this.collectionId,this.sampleId);
@@ -441,7 +479,29 @@ export default {
         } else if (ret.data.result[i].group == 'VIR') {
           this.virulomeData = ret.data.result[i].data;
 
-        } else if (ret.data.result[i].group == 'CONTIG') {
+        } 
+        else if (ret.data.result[i].group == 'VCF') {
+          this.vcfData = ret.data.result[i].data;
+          var count_mul_dna=0;
+          for(var i=0;i<this.vcfData.dna.length;i++){
+            var geneCluster=this.vcfData.dna[i].gene;
+            for(var j=0;j<this.vcfData.dna[i].mul.length;j++){
+              this.vcfDNAList.push({
+                id:count_mul_dna,
+                gene:geneCluster,
+                chrom:this.vcfData.dna[i].mul[j].chrom,
+                pos:this.vcfData.dna[i].mul[j].pos,
+                ref:this.vcfData.dna[i].mul[j].ref,
+                alt:this.vcfData.dna[i].mul[j].alts
+              });
+              count_mul_dna++;
+            }
+            
+          }
+          
+
+        }
+        else if (ret.data.result[i].group == 'CONTIG') {
           this.assemblyData = ret.data.result[i].data;
           this.assemblyData.GC = Math.trunc(this.assemblyData.GC) + ' %';
 

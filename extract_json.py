@@ -11,6 +11,7 @@ import datetime
 import pandas as pd
 from Bio import SeqIO
 from ete3 import Tree
+import vcf
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +48,7 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
    # if (not os.path.isabs(exp_dir_downloadfile)):
     #    exp_dir_downloadfile =os.path.join(os.path.dirname(__file__),exp_dir_downloadfile)
     report = json.load(open(dump_file))
-
+    map_geneid_cluster=loadClusterMap(report['pan'] + '/gene_presence_absence.csv')
     # export single samples
     web_samples = []
     for sample in report['samples']:
@@ -64,7 +65,7 @@ def export_json(work_dir, webapp_data_dir, collection_id, collection_name=''):
         sample_results.append({'group': 'AMR', 'data': find_amr(sample['resistome'])})
         sample_results.append({'group': 'PLASMID', 'data': find_plasmid(sample['plasmid'])})
         sample_results.append({'group': 'ANNOTATION', 'data': export_known_genes(sample['annotation_gff'])})
-
+        sample_results.append({'group': 'VCF', 'data': export_vcf_single(map_geneid_cluster,report['vcf'],sample['id'])})
         sample['result'] = sample_results
 
         # TODO: Quang to review if this function stores more than we need
@@ -483,6 +484,74 @@ def export_alignment(gene, aln_dir, exp_dir):
     return "/set/alignments/" + gene + ".json.gz"
     # return aligments
 
+def export_vcf_single(map_geneid_cluster,vcf_dir,sample_id):
+    sample_vcf_folder=os.path.join(vcf_dir,sample_id)
+    if not os.path.exists(sample_vcf_folder):
+        return {}
+    prot_vcf=readVCF(sample_vcf_folder+"/"+sample_id+".prot.vcf.gz")
+    dna_vcf=readVCF(sample_vcf_folder+"/"+sample_id+".vcf.gz")
+    list_prot_mul={}
+    list_dna_mul={}
+    for mul in prot_vcf:
+        gene_ref=mul['chrom']
+        if '-' in gene_ref:
+            gene_ref=gene_ref[gene_ref.rfind('-')+1:]
+        mul['chrom']=gene_ref    
+        gene_cluster=map_geneid_cluster[mul['chrom']]
+        if not gene_cluster in list_prot_mul.keys():
+            list_prot_mul[gene_cluster]={'gene':gene_cluster,'mul':[],'num':0}
+        list_prot_mul[gene_cluster]['mul'].append(mul)
+        list_prot_mul[gene_cluster]['num']=list_prot_mul[gene_cluster]['num']+1
+        
+    for mul in dna_vcf:
+        gene_ref=mul['chrom']
+        if '-' in gene_ref:
+            gene_ref=gene_ref[gene_ref.rfind('-')+1:]
+        mul['chrom']=gene_ref
+        gene_cluster=map_geneid_cluster[mul['chrom']]
+        if not gene_cluster in list_dna_mul.keys():
+            list_dna_mul[gene_cluster]={'gene':gene_cluster,'mul':[],'num':0}
+        list_dna_mul[gene_cluster]['mul'].append(mul)
+        list_dna_mul[gene_cluster]['num']=list_dna_mul[gene_cluster]['num']+1
+    #print(list(list_prot_mul.items()))
+    #print(list(list_dna_mul.items()))
+    ret_pro_list=[]
+    for k in list_prot_mul.keys():
+        ret_pro_list.append(list_prot_mul[k])
+    ret_dna_list=[]
+    for k in list_dna_mul.keys():
+        ret_dna_list.append(list_dna_mul[k])
+    #json.dump(ret_dna_list, open(sample_vcf_folder + '/nucls.json', 'w'))
+    return {'prot':ret_pro_list,'dna':ret_dna_list}
+def loadClusterMap(pre_abs_file):
+    map_geneid_cluster={}
+    with open(pre_abs_file, 'rt') as tsvfile:
+        reader = csv.reader(tsvfile, delimiter=',', dialect='excel-tab')
+        for row in reader:
+            for i in range(8,len(row)):
+                geneids=row[i].split('\t')
+            
+                for geneid in geneids:
+                    if '-' in geneid:
+                        geneid=geneid[geneid.rfind('-')+1:]
+                    map_geneid_cluster[geneid]=row[0]
+    return map_geneid_cluster
+            
+   
+def readVCF(vcffile):
+    arrmul=[]
+    print(vcffile)
+    if vcffile.endswith(".gz"):
+        cmd = 'gzip -dk '+vcffile
+    
+        os.system(cmd)
+        vcffile=vcffile.replace('.gz','')
+    print(vcffile)
+    vcf_reader = vcf.Reader(open(vcffile, 'rt')) 
+    for record in vcf_reader:
+        arrmul.append({'chrom':record.CHROM,'pos':record.POS,'ref':record.REF,'alts':str(record.ALT)})
+        
+    return arrmul           
 
 def update_collection_history(export_dir, collection_id, collection_name, status):
     collection_json = os.path.join(export_dir, 'collections.json')
