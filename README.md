@@ -158,7 +158,7 @@ To analyze the dataset
 This dataset contains 24 Klebsiella pneumoniae samples. To download the raw data for the dataset
 
 ```bash
-(cd examples/Kp24/raw && ./download_kp24_ascp.sh)
+(cd examples/Kp24/raw && ./download_kp24.sh)
 ```
 
 To analyze the dataset
