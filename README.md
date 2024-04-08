@@ -136,9 +136,34 @@ Adjust the number of cpus and the amount of memory allocated for running analysi
 ./amrviz.py pa  -t 20 -m 28 -c Kp100 -i examples/Kp100/config_Kp100.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 103 MDR clinical Kp isolates"
 ```
 
-For the miniature dataset
+For analyzing the miniature dataset
 ```bash
 ./amrviz.py pa  -t 20 -m 28 -c KpMini -i examples/Kp100/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Mini collection 7 Kp isolates"
+```
+
+
+##### iGAS70
+This dataset contains 76 Steptococcus pyogenes samples. To download the raw data for the dataset
+
+```bash
+(cd examples/iGAS70/raw && ./download_ascp.sh)
+```
+
+To analyze the dataset
+```bash
+./amrviz.py pa -t 20 -m 25 -c iGAS70 -i examples/iGAS70/config_iGAS70.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of >70 Steptococcus pyogenes from MDU-Australia."
+```
+
+##### Kp24
+This dataset contains 24 Klebsiella pneumoniae samples. To download the raw data for the dataset
+
+```bash
+(cd examples/Kp24/raw && ./download_kp24_ascp.sh)
+```
+
+To analyze the dataset
+```bash
+./amrviz.py pa -t 20 -m 25 -c KpMDR -i examples/Kp24/config_Kp24.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of MDR Klebsiella pneumoniae"
 ```
 
 
@@ -166,17 +191,11 @@ docker run -v `pwd`:/misc/amrviz -w /misc/amrviz  --publish 3000:3000  amromics/
 The web application is auto opened on the URL **localhost:3000** (or another port if this port is occupied). 
 -->
 
-#### Analyze the miniature dataset
-
 
 With the following command, the system will perform genomics analysis, 
 including pan-genome analysis of the five samples and import the results to 
 the web-app for visualization:
 
-
-### Case study example
-To analyze another dataset including 89 Klebsiella pneumoniae samples, 
-run the following commands to download the raw data:
 
 ```bash
 cd examples/iGAS70/raw
@@ -187,9 +206,6 @@ cd ../../
 The following command will run those 76 samples through the pipeline, and import the results
 to the web-app for visualization:
 
-```bash
-./amrviz.py pa -t 8 -m 15 -c iGAS70 -i examples/iGAS70/config.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of >70 Steptococcus pyogenes from MDU-Australia."
-```
 
 <!--
 
