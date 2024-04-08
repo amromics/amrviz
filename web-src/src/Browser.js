@@ -3,7 +3,7 @@ import * as d3 from "d3";
 export class Browser {
   constructor(element) {
     this.container = element;
-
+    console.log(element);
     this.contigs = [];
     this.knowngenes = [];
     this.gc_skew = [];

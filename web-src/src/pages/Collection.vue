@@ -359,11 +359,12 @@ export default {
           ]
 
       });
+      let router=this.$router;
       var collectionId=this.collectionId;
        $("#samples_table tbody").on("click", "td.go-control", function() {
         var data = table.row($(this)).data();
-        //router.push({ path: `sample/${data[1]}/${data[0]}`})
-        window.open("/sample/"+collectionId+"/" + data[0], "_blank");
+        router.push({ path: `../sample/${collectionId}/${data[0]}`})
+        //window.open("/sample/"+collectionId+"/" + data[0]);
       });
       var childtemplate = function(d) {
         //console.log(d);

@@ -39,7 +39,7 @@ tr.shown td.details-control {
       <div>Data loading...</div>
     </div>
  
- 
+ <div class="col-12" v-if="!isLoading&&isReady">
 
         <card title="Samples" v-if="!isLoading&&isReady"
                     sub-title="List of samples">
@@ -47,6 +47,7 @@ tr.shown td.details-control {
           <table id="sample_table" class="display">
       </table>
         </card>
+         </div>
   </div>
 </template>
 <script>
