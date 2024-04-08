@@ -49,7 +49,7 @@ cd amrviz
 
 The instructions below assume working from the root directory for the repository.
    
-2. Create a conda environment named `amromics` with all the necessary dependencies: 
+2. Create a conda environment named `amromics` with all the necessary dependencies.  
 
 ```bash
 conda create -y -c conda-forge -c defaults --name amromics python=3.10 mamba
@@ -64,7 +64,9 @@ pip install panta
 
 ```
 
-3 Extract databases
+For all subsequent steps, assume that environment `amromics` is activated.
+
+3. Extract databases
    
 ```bash
 tar zxvf submodules/amromics/db.tar.gz
@@ -78,6 +80,7 @@ mamba install -y -c conda-forge  nodejs==14.8.0
 npm install -g live-server
 ```
 
+<!--
 5 (Optional) Setup and build web application using *npm*
 
 ```bash
@@ -89,23 +92,57 @@ npm run build --modern
 We provide a docker container, namely amromics/amrviz for AMRViz application. 
 To use AMRViz docker, make sure that docker is installed on your system. Installation
 for docker requires only the first two steps as above.
+-->
 
-### Usage
-
-#### Prepare a miniature dataset
-
-To illustrate AMRViz usage, we prepare a small dataset consisting of 5 Klebsiella pneumoniae 
-samples, including one reference sequence, to test the software. To download the raw data 
-for the dataset:
+Once all the packages are installed, the web-based platform can be started (once only) by
 
 ```bash
-# with conda installation 
-cd examples/Kp89/raw
-./download_mini.sh
-cd ../../..
+./amrviz.py start -p 3000 --webapp-dir web-app/
+
+```
+ 
+Here, port 3000 is assumed. If the port is not available, please choose another number. Once the server has been started, the platform can be accessed via a web-browser at the address http://localhost:3000/.
+
+
+### Case studies 
+
+To illustrate AMRViz usage, we prepare several datasets and instructions how to analyze the.
+
+##### Kp100
+
+The Kp100 dataset consists of 89 Klebsiella pneumoniae samples sequenced with Illumina technology, 11 samples with Oxfort Nanopore and 1 sample with Pacbio. The ENA accessions for these samples are listed in `examples/Kp100/raw/acc_list.csv`. We also include two reference genomes in the dataset.
+   
+To prepare the input data for the case study, run
+
+```bash
+(cd examples/Kp100/raw && ./download_acsp.sh)
+```
+This might take a few hours depending on the network connection. Alternatively, you can use your favourite download tools to download the listed accessions.
+
+We also provide a miniature dataset which is a subset of 7 samples of the Kp100 dataset. To download the raw data for the miniature dataset
+
+```bash
+(cd examples/Kp100/raw && ./download_mini.sh)
+```
+
+To run the pipeline, users need to provide a *tsv* file listing the samples and input
+data in either *fastq* (sequencing reads) or *fasta* (assemply). The input file for the 
+Kp100 dataset is under `examples/Kp100/raw/config_K100.tsv`
+
+To perform analysis on the Kp100 dataset, and to import to the web platform, run the followint command line.
+Adjust the number of cpus and the amount of memory allocated for running analysis according to the hardware configuration of your computer.
+
+```bash
+./amrviz.py pa  -t 20 -m 28 -c Kp100 -i examples/Kp100/config_Kp100.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 103 MDR clinical Kp isolates"
+```
+
+For the miniature dataset
+```bash
+./amrviz.py pa  -t 20 -m 28 -c KpMini -i examples/Kp100/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Mini collection 7 Kp isolates"
 ```
 
 
+<!--
 ```bash
 # with docker installation 
 docker run -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz /bin/bash -c 'cd examples/Kp89/raw/;bash download_mini.sh'
@@ -127,33 +164,15 @@ docker run -v `pwd`:/misc/amrviz -w /misc/amrviz  --publish 3000:3000  amromics/
 ```
 
 The web application is auto opened on the URL **localhost:3000** (or another port if this port is occupied). 
+-->
 
 #### Analyze the miniature dataset
-
-To run the pipeline, users need to provide a *tsv* file listing the samples and input
-data in either *fastq* (sequencing reads) or *fasta* (assemply). The input file for the 
-miniature dataset is under ` examples/Kp89/config_mini.tsv`
 
 
 With the following command, the system will perform genomics analysis, 
 including pan-genome analysis of the five samples and import the results to 
 the web-app for visualization:
 
-```bash
-# with conda instalation
-./amrviz.py pa  --time-log Kp7_log.time -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 6 MDR clinical Kp isolates"
-```
-
-```bash
-# with docker instalation
-docker run  -v `pwd`:/misc/amrviz -w /misc/amrviz amromics/amrviz amrviz.py pa -t 8 -m 15 -c KpMini -i examples/Kp89/config_mini.tsv --work-dir data/work --webapp-dir web-app/  -n "Collection of 4 MDR clinical Kp isolates"
-```
-
-#### Known issues
-
-- For MacOS and Windows/WSL, one of the steps of the assembly process (`kmc`) 
-  crashes with the the conda installation. If your collection includes samples needed
-  assemby (ie in fastq input data), please set the estimated genome size (`gsize`) to bypass running kmc. See `examples/Kp89/config_mini.tsv` for example.
 
 ### Case study example
 To analyze another dataset including 89 Klebsiella pneumoniae samples, 
@@ -171,9 +190,6 @@ to the web-app for visualization:
 ```bash
 ./amrviz.py pa -t 8 -m 15 -c iGAS70 -i examples/iGAS70/config.tsv --work-dir data/work --webapp-dir web-app  -n "Collection of >70 Steptococcus pyogenes from MDU-Australia."
 ```
-
-
-
 
 <!--
 
@@ -195,6 +211,5 @@ Please check the sample input file *data/samples/set1.tsv* for an example.
   + *gram* column should be empty. ((To-do: Delete gram column?))
   + *metadata* is empty or in the format: key1:value1;key2:value2;...  
   For example: Geographic Location:Houston,USA;Insert Date:8/8/2017;Host Name:Human, Homo sapiens;ampicillin:Resistant;aztreonam:Resistant;ciprofloxacin:Resistant;gentamicin:Susceptible;tetracycline:Susceptible
-
 
 -->
