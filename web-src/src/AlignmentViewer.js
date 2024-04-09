@@ -240,6 +240,7 @@ export class AlignmentViewer {
     //console.log("arr from tree");
     //console.log(arr_sample_from_tree);
     // edit leaft position y (x coordinate):
+   
     var distance_per_depth = width_tree / max_depth;
     var unit_distance = width_tree / max_heigth;
     stack = [];
@@ -266,9 +267,11 @@ export class AlignmentViewer {
       //setup node by heigth
       //n.ay = n.height * unit_distance;
       //console.log(this.display_branch_length);
-      if(this.display_branch_length)
+      if(this.display_branch_length && max_heigth>0)
         n.ay = this.logscale(min_height_not_zero,max_heigth,width_tree,n.height);
     }
+    //console.log("max depth="+max_depth);
+    console.log("max height="+max_heigth);
     for (var d = max_depth; d >= 0; d--) {
       stack = [];
       stack.push(nodes);
