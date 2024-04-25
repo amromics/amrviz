@@ -1,6 +1,6 @@
 #!/bin/bash
 #Install IBM aspera-connect 4.1.3 (note that latest version doesn't work):
-if [ ! -f ~/.aspera/connect/bin/ascp ] || [ -f ~/.aspera/connect/etc/asperaweb_id_dsa.openssh ]
+if [ ! -f ~/.aspera/connect/bin/ascp ] || [ ! -f ~/.aspera/connect/etc/asperaweb_id_dsa.openssh ]
 then
   wget https://ak-delivery04-mul.dhe.ibm.com/sar/CMA/OSA/0adrj/0/ibm-aspera-connect_4.1.3.93_linux.tar.gz
   tar zxvf ibm-aspera-connect_4.1.3.93_linux.tar.gz
