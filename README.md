@@ -115,7 +115,7 @@ The Kp100 dataset consists of 89 Klebsiella pneumoniae samples sequenced with Il
 To prepare the input data for the case study, run
 
 ```bash
-(cd examples/Kp100/raw && ./download_acsp.sh)
+(cd examples/Kp100/raw && ./download_ascp.sh)
 ```
 This might take a few hours depending on the network connection. Alternatively, you can use your favourite download tools to download the listed accessions.
 
