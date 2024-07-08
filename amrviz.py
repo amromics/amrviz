@@ -67,7 +67,7 @@ def collection_extract_func(args):
 
     # Making sure the analysis for the
     cmd = f'amr-analysis.py pg -t {args.threads} -m {args.memory} -i {args.input} -c {collection_id}'
-    cmd += f' --work-dir {work_dir} -n "{collection_name}" --genetree'
+    cmd += f' --work-dir {work_dir} -n "{collection_name}" -r {args.ratio_coverage} --genetree'
     if args.time_log is not None:
         cmd += f' --time-log {args.time_log}'
     print(cmd)
@@ -105,6 +105,8 @@ def main(arguments=sys.argv[1:]):
     pa_cmd.add_argument('-c', '--collection-id', help='Collection ID', required=True, type=str)
     pa_cmd.add_argument('-n', '--collection-name', help='Collection name', type=str, default='')
     pa_cmd.add_argument('-i', '--input', help='Input file', required=True, type=str)
+    pa_cmd.add_argument('-r', '--ratio-coverage', help='Ratio of coverage to align', default=0.15, type=float)
+
     pa_cmd.add_argument('--work-dir', help='Working directory', default='data/work')
     pa_cmd.add_argument('--webapp-dir', help='Webapp directory', default='web-app')
     pa_cmd.add_argument('--time-log', help='Time log file', default=None, type=str)
@@ -122,7 +124,7 @@ def main(arguments=sys.argv[1:]):
     re_export_cmd.set_defaults(func=export_result )
     re_export_cmd.add_argument('-c', '--collection-id', help='Collection ID', required=True, type=str)
     re_export_cmd.add_argument('-n', '--collection-name', help='Collection name', type=str, default='')
-    
+
     re_export_cmd.add_argument('--work-dir', help='Working directory', default='data/work')
     re_export_cmd.add_argument('--webapp-dir', help='Webapp directory', default='web-app')
 
